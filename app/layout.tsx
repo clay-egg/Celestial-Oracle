@@ -22,6 +22,18 @@ export const metadata: Metadata = {
   title: 'Celestial Oracle - Fortune Teller',
   description: 'Unveil the mysteries of your destiny. Get personalized fortune readings based on your zodiac sign, birth details, and cosmic alignments.',
   generator: 'v0.app',
+  openGraph: {
+    title: 'Celestial Oracle - Fortune Teller',
+    description: 'Unveil the mysteries of your destiny. Get personalized fortune readings based on your zodiac sign, birth details, and cosmic alignments.',
+    siteName: 'Celestial Oracle',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Celestial Oracle - Fortune Teller',
+    description: 'Unveil the mysteries of your destiny. Get personalized fortune readings based on your zodiac sign, birth details, and cosmic alignments.',
+  },
   icons: {
     icon: '/icon.svg',
     apple: '/apple-icon.png',
