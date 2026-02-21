@@ -442,16 +442,27 @@ export interface PersonalReading {
   lunarPhase: string;
   // Rich reading sections (used by the UI)
   greeting: string;
+  greetingTh: string;
   cosmicAlignment: string;
+  cosmicAlignmentTh: string;
   lunarInfluence: string;
+  lunarInfluenceTh: string;
   timeEnergy: string;
+  timeEnergyTh: string;
   seasonalWisdom: string;
+  seasonalWisdomTh: string;
   numerologyInsight: string;
+  numerologyInsightTh: string;
   elementalReading: string;
+  elementalReadingTh: string;
   personalAdvice: string;
+  personalAdviceTh: string;
   overallEnergy: string;
+  overallEnergyTh: string;
   warnings: string;
+  warningsTh: string;
   closingMessage: string;
+  closingMessageTh: string;
 }
 
 export function generatePersonalReading(input: PersonalReadingInput): PersonalReading {
@@ -520,14 +531,20 @@ export function generatePersonalReading(input: PersonalReadingInput): PersonalRe
   const seasonLabel = seasonB >= 8 ? "summer" : seasonB >= 7 ? "spring" : seasonB >= 6 ? "twilight season" : "winter";
 
   const greetingEn = `Dear ${input.name}, the stars have heard your question. As a ${zodiacSign} born under the energy of ${zodiac.ruler}, the cosmos speaks to you now.`;
+  const greetingTh = `ถึง ${input.name}, ดวงดาวได้รับฟังคำถามของคุณแล้ว ในฐานะชาวราศี${zodiacSign} ที่เกิดภายใต้พลังของ${zodiac.ruler}, จักรวาลกำลังสื่อสารกับคุณ`;
   const cosmicAlignmentEn = `Your ${zodiacSign} energy resonates at a cosmic score of ${score}/100 today. The ${zodiac.element} element that guides you is ${verdict.level === "very_positive" || verdict.level === "positive" ? "powerfully aligned" : "calling for patience and wisdom"}. ${verdict.label} — ${verdict.labelTh}.`;
+  const cosmicAlignmentTh = `พลังงานราศี${zodiacSign} ของคุณสั่นสะเทือนด้วยคะแนนจักรวาล ${score}/100 ในวันนี้ ธาตุ${zodiac.element} ที่นำทางคุณกำลัง ${verdict.level === "very_positive" || verdict.level === "positive" ? "สอดประสานอย่างทรงพลัง" : "เรียกร้องความอดทนและปัญญา"} ${verdict.labelTh}`;
 
   const lunarInfluenceEn = `The current moon phase is ${phase}. This brings an energy bonus of +${lunarBonus} to your reading. This is a time of ${phase === "Full Moon" || phase.includes("Waxing") ? "growth and clarity" : "reflection and release"}.`;
+  const lunarInfluenceTh = `ข้างขึ้นข้างแรมปัจจุบันคือ ${phase} นำโบนัสพลังงาน +${lunarBonus} มาสู่คำพยากรณ์ นี่คือช่วงเวลาแห่ง ${phase === "Full Moon" || phase.includes("Waxing") ? "การเติบโตและความชัดเจน" : "การทบทวนและการปล่อยวาง"}`;
 
   const timeEnergyEn = `The ${timeLabel} energy surrounding your reading shifts your cosmic balance, opening new channels of perception.`;
+  const timeEnergyTh = `พลังงานช่วง${timeLabel} ที่ล้อมรอบคำพยากรณ์ของคุณ กำลังปรับสมดุลจักรวาล เปิดรับการรับรู้ใหม่ๆ`;
   const seasonalWisdomEn = `As we move through the ${seasonLabel}, the natural cycles mirror your current path, suggesting you ${score > 50 ? "push forward with confidence" : "conserve energy for the right moment"}.`;
+  const seasonalWisdomTh = `ขณะที่เราผ่านฤดู${seasonLabel} วงจรธรรมชาติสะท้อนเส้นทางปัจจุบันของคุณ แนะนำให้คุณ${score > 50 ? "ก้าวไปข้างหน้าอย่างมั่นใจ" : "สงวนพลังงานไว้สำหรับจังหวะที่เหมาะสม"}`;
 
   const numerologyInsightEn = `Your name number (${nameNum}) combined with your life path (${lifePath}) creates a strong resonance with the number ${lifePath + nameNum > 9 ? (lifePath + nameNum) % 9 + 1 : lifePath + nameNum}. This number often signifies a moment of karmic significance in matters like ${topic}.`;
+  const numerologyInsightTh = `เลขชื่อของคุณ (${nameNum}) รวมกับเลขเส้นทางชีวิต (${lifePath}) สร้างความสั่นสะเทือนที่แข็งแกร่งกับเลข ${lifePath + nameNum > 9 ? (lifePath + nameNum) % 9 + 1 : lifePath + nameNum} ตัวเลขนี้มักหมายถึงช่วงเวลาสำคัญทางกรรมในเรื่อง ${topic}`;
 
   return {
     age,
@@ -550,16 +567,27 @@ export function generatePersonalReading(input: PersonalReadingInput): PersonalRe
     lunarPhase: phase,
     // Rich UI sections (overridden by AI when available)
     greeting: greetingEn,
+    greetingTh: greetingTh,
     cosmicAlignment: cosmicAlignmentEn,
+    cosmicAlignmentTh: cosmicAlignmentTh,
     lunarInfluence: lunarInfluenceEn,
+    lunarInfluenceTh: lunarInfluenceTh,
     timeEnergy: timeEnergyEn,
+    timeEnergyTh: timeEnergyTh,
     seasonalWisdom: seasonalWisdomEn,
+    seasonalWisdomTh: seasonalWisdomTh,
     numerologyInsight: numerologyInsightEn,
+    numerologyInsightTh: numerologyInsightTh,
     elementalReading: answerData.answer,
+    elementalReadingTh: answerData.answerTh,
     personalAdvice: advice.en,
+    personalAdviceTh: advice.th,
     overallEnergy: `${verdict.label}. Your cosmic score is ${score}/100. ${score >= 65 ? "This is a favorable period to move forward." : score >= 45 ? "Proceed with mindful effort and patience." : "Pause, reflect, and let the stars realign before acting."}`,
+    overallEnergyTh: `${verdict.labelTh}. คะแนนจักรวาลคือ ${score}/100 ${score >= 65 ? "เป็นช่วงเวลาที่ดีที่จะเดินหน้า" : score >= 45 ? "จงก้าวไปด้วยความใจเย็นและมีสติ" : "หยุดพักและให้ดวงดาวจัดเรียงตัวใหม่ก่อนลงมือทำ"}`,
     warnings: warningList[seed % warningList.length].en,
+    warningsTh: warningList[seed % warningList.length].th,
     closingMessage: `The stars have spoken for you today, ${input.name}. Trust in the cosmic timing of all things. May the energy of ${zodiac.ruler} guide your path with wisdom and grace. ✨`,
+    closingMessageTh: `ดวงดาวได้ส่องทางให้คุณแล้ววันนี้ ${input.name} จงเชื่อมั่นในจังหวะของจักรวาล ขอให้พลังแห่ง${zodiac.ruler} นำทางคุณด้วยปัญญาและสิริมงคล ✨`,
   };
 }
 
@@ -637,16 +665,27 @@ Return this exact JSON structure:
     return {
       ...base,
       greeting: aiData.greeting || base.greeting,
+      greetingTh: aiData.greetingTh || base.greetingTh,
       cosmicAlignment: aiData.cosmicAlignment || base.cosmicAlignment,
+      cosmicAlignmentTh: aiData.cosmicAlignmentTh || base.cosmicAlignmentTh,
       lunarInfluence: aiData.lunarInfluence || base.lunarInfluence,
+      lunarInfluenceTh: aiData.lunarInfluenceTh || base.lunarInfluenceTh,
       timeEnergy: aiData.timeEnergy || base.timeEnergy,
+      timeEnergyTh: aiData.timeEnergyTh || base.timeEnergyTh,
       seasonalWisdom: aiData.seasonalWisdom || base.seasonalWisdom,
+      seasonalWisdomTh: aiData.seasonalWisdomTh || base.seasonalWisdomTh,
       numerologyInsight: aiData.numerologyInsight || base.numerologyInsight,
+      numerologyInsightTh: aiData.numerologyInsightTh || base.numerologyInsightTh,
       elementalReading: aiData.elementalReading || base.elementalReading,
+      elementalReadingTh: aiData.elementalReadingTh || base.elementalReadingTh,
       personalAdvice: aiData.personalAdvice || base.personalAdvice,
+      personalAdviceTh: aiData.personalAdviceTh || base.personalAdviceTh,
       overallEnergy: aiData.overallEnergy || base.overallEnergy,
+      overallEnergyTh: aiData.overallEnergyTh || base.overallEnergyTh,
       warnings: aiData.warnings || base.warnings,
+      warningsTh: aiData.warningsTh || base.warningsTh,
       closingMessage: aiData.closingMessage || base.closingMessage,
+      closingMessageTh: aiData.closingMessageTh || base.closingMessageTh,
       luckyNumbers: Array.isArray(aiData.luckyNumbers) ? aiData.luckyNumbers : base.luckyNumbers,
       luckyDay: aiData.luckyDay || base.luckyDay,
       luckyDayTh: aiData.luckyDayTh || base.luckyDayTh,

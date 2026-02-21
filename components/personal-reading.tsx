@@ -99,7 +99,7 @@ export function PersonalReadingSection() {
               {/* Greeting */}
               <div className="mb-8 p-6 rounded-xl bg-secondary/50 border border-primary/10">
                 <p className="font-serif text-lg text-foreground leading-relaxed italic">
-                  {reading.greeting}
+                  {lang === "th" ? reading.greetingTh : reading.greeting}
                 </p>
               </div>
 
@@ -108,43 +108,43 @@ export function PersonalReadingSection() {
                 <ReadingBlock
                   icon={<Sun className="w-5 h-5 text-primary" />}
                   title={t("personal.cosmic")}
-                  content={reading.cosmicAlignment}
+                  content={lang === "th" ? reading.cosmicAlignmentTh : reading.cosmicAlignment}
                 />
                 <ReadingBlock
                   icon={<Moon className="w-5 h-5 text-primary" />}
                   title={t("personal.lunar")}
-                  content={reading.lunarInfluence}
+                  content={lang === "th" ? reading.lunarInfluenceTh : reading.lunarInfluence}
                 />
                 <ReadingBlock
                   icon={<Sparkles className="w-5 h-5 text-primary" />}
                   title={t("personal.time_energy")}
-                  content={reading.timeEnergy}
+                  content={lang === "th" ? reading.timeEnergyTh : reading.timeEnergy}
                 />
                 <ReadingBlock
                   icon={<Calendar className="w-5 h-5 text-primary" />}
                   title={t("personal.seasonal")}
-                  content={reading.seasonalWisdom}
+                  content={lang === "th" ? reading.seasonalWisdomTh : reading.seasonalWisdom}
                 />
                 <ReadingBlock
                   icon={<Hash className="w-5 h-5 text-primary" />}
                   title={t("personal.numerology")}
-                  content={reading.numerologyInsight}
+                  content={lang === "th" ? reading.numerologyInsightTh : reading.numerologyInsight}
                 />
 
                 <ReadingBlock
                   icon={<Star className="w-5 h-5 text-primary" />}
                   title={t("personal.advice")}
-                  content={reading.personalAdvice}
+                  content={lang === "th" ? reading.personalAdviceTh : reading.personalAdvice}
                 />
                 <ReadingBlock
                   icon={<Star className="w-5 h-5 text-primary" />}
                   title={t("personal.overall")}
-                  content={reading.overallEnergy}
+                  content={lang === "th" ? reading.overallEnergyTh : reading.overallEnergy}
                 />
                 <ReadingBlock
                   icon={<ShieldAlert className="w-5 h-5 text-primary" />}
                   title={t("personal.warning")}
-                  content={reading.warnings}
+                  content={lang === "th" ? reading.warningsTh : reading.warnings}
                 />
               </div>
 
@@ -157,7 +157,7 @@ export function PersonalReadingSection() {
                   </h4>
                 </div>
                 <p className="font-serif text-lg text-foreground leading-relaxed">
-                  {reading.elementalReading}
+                  {lang === "th" ? reading.elementalReadingTh : reading.elementalReading}
                 </p>
               </div>
 
@@ -180,7 +180,7 @@ export function PersonalReadingSection() {
               {/* Closing */}
               <div className="mt-8 p-6 rounded-xl bg-secondary/50 border border-primary/10 text-center">
                 <p className="font-serif text-foreground leading-relaxed italic">
-                  {reading.closingMessage}
+                  {lang === "th" ? reading.closingMessageTh : reading.closingMessage}
                 </p>
               </div>
 

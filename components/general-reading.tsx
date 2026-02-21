@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/language-context";
 import { Heart, Coins, Activity, Star, Sparkles, ChevronRight, RotateCcw } from "lucide-react";
 
 export function GeneralReadingSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const CATEGORIES: { id: Category; label: string; icon: React.ReactNode; description: string }[] = [
     { id: "love", label: t("general.love"), icon: <Heart className="w-6 h-6" />, description: t("general.love_desc") },
@@ -104,25 +104,25 @@ export function GeneralReadingSection() {
               {/* Overview */}
               <div className="mb-6 p-6 rounded-xl bg-secondary/50 border border-primary/10">
                 <h4 className="font-sans text-sm text-primary uppercase tracking-widest mb-3">{t("general.overview")}</h4>
-                <p className="font-serif text-lg text-foreground leading-relaxed">{reading.overview}</p>
+                <p className="font-serif text-lg text-foreground leading-relaxed">{lang === "th" ? reading.overviewTh : reading.overview}</p>
               </div>
 
               {/* Details */}
               <div className="mb-6 p-5 rounded-xl bg-secondary/30 border border-border/50">
                 <h4 className="font-sans text-sm text-primary uppercase tracking-widest mb-3">{t("general.details")}</h4>
-                <p className="font-serif text-foreground leading-relaxed">{reading.details}</p>
+                <p className="font-serif text-foreground leading-relaxed">{lang === "th" ? reading.detailsTh : reading.details}</p>
               </div>
 
               {/* Advice */}
               <div className="mb-6 p-5 rounded-xl border-2 border-primary/30 bg-primary/5">
                 <h4 className="font-sans text-sm text-primary uppercase tracking-widest mb-3">{t("general.advice")}</h4>
-                <p className="font-serif text-lg text-foreground leading-relaxed">{reading.advice}</p>
+                <p className="font-serif text-lg text-foreground leading-relaxed">{lang === "th" ? reading.adviceTh : reading.advice}</p>
               </div>
 
               {/* Caution */}
               <div className="mb-6 p-5 rounded-xl bg-secondary/30 border border-border/50">
                 <h4 className="font-sans text-sm text-destructive uppercase tracking-widest mb-3">{t("general.caution")}</h4>
-                <p className="font-serif text-foreground leading-relaxed">{reading.caution}</p>
+                <p className="font-serif text-foreground leading-relaxed">{lang === "th" ? reading.cautionTh : reading.caution}</p>
               </div>
 
               {/* Lucky Info */}
@@ -149,7 +149,7 @@ export function GeneralReadingSection() {
               <div className="p-6 rounded-xl bg-secondary/50 border border-primary/10 text-center">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest mb-3">{t("general.affirmation")}</p>
                 <p className="font-serif text-xl text-primary leading-relaxed italic">
-                  {"\""}{reading.affirmation}{"\""}
+                  {"\""}{lang === "th" ? reading.affirmationTh : reading.affirmation}{"\""}
                 </p>
               </div>
 
@@ -204,8 +204,8 @@ export function GeneralReadingSection() {
                 <div key={s} className="flex items-center gap-2">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-sans text-sm transition-all ${step >= s
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-muted-foreground border border-border"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-muted-foreground border border-border"
                       }`}
                   >
                     {s}
@@ -233,8 +233,8 @@ export function GeneralReadingSection() {
                         setStep(2);
                       }}
                       className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all hover:scale-105 ${selectedSign === sign
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                         }`}
                     >
                       <ZodiacIcon sign={sign} size={32} />
@@ -265,8 +265,8 @@ export function GeneralReadingSection() {
                         setStep(3);
                       }}
                       className={`flex flex-col items-center gap-3 p-6 rounded-xl border transition-all hover:scale-105 ${selectedCategory === cat.id
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                         }`}
                     >
                       <div className={`w-14 h-14 rounded-full flex items-center justify-center ${selectedCategory === cat.id ? "bg-primary/20" : "bg-secondary"
@@ -305,8 +305,8 @@ export function GeneralReadingSection() {
                       type="button"
                       onClick={() => setSelectedPeriod(per.id)}
                       className={`flex flex-col items-center gap-2 p-5 rounded-xl border transition-all hover:scale-105 ${selectedPeriod === per.id
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                         }`}
                     >
                       <span className="font-sans text-lg">{per.label}</span>
