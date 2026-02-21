@@ -1,0 +1,158 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0a0a12;
+  --foreground: #e8e0d4;
+  --card: #12121e;
+  --card-foreground: #e8e0d4;
+  --popover: #12121e;
+  --popover-foreground: #e8e0d4;
+  --primary: #c9a84c;
+  --primary-foreground: #0a0a12;
+  --secondary: #1a1a2e;
+  --secondary-foreground: #e8e0d4;
+  --muted: #1a1a2e;
+  --muted-foreground: #8a8098;
+  --accent: #c9a84c;
+  --accent-foreground: #0a0a12;
+  --destructive: #c44040;
+  --destructive-foreground: #e8e0d4;
+  --border: #2a2a3e;
+  --input: #1a1a2e;
+  --ring: #c9a84c;
+  --chart-1: #c9a84c;
+  --chart-2: #6a4c93;
+  --chart-3: #3a86c4;
+  --chart-4: #c44040;
+  --chart-5: #4caf50;
+  --radius: 0.75rem;
+  --mystic-glow: #c9a84c33;
+  --mystic-deep: #06060e;
+}
+
+@theme inline {
+  --font-sans: 'Cinzel', 'Cinzel Fallback', serif;
+  --font-serif: 'Cormorant Garamond', 'Cormorant Garamond Fallback', serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-mystic-glow: var(--mystic-glow);
+  --color-mystic-deep: var(--mystic-deep);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--mystic-glow), 0 0 40px var(--mystic-glow); }
+  50% { box-shadow: 0 0 30px var(--mystic-glow), 0 0 60px var(--mystic-glow), 0 0 80px var(--mystic-glow); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-orbit {
+  animation: orbit 20s linear infinite;
+}
+
+.mystic-gradient {
+  background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%);
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #c9a84c, #e8d48b, #c9a84c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #e8e0d4;
+  border-radius: 50%;
+}
+
+.reading-result {
+  background: linear-gradient(135deg, #12121e 0%, #1a1a2e 50%, #12121e 100%);
+  border: 1px solid #c9a84c33;
+}
