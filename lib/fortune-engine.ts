@@ -117,7 +117,7 @@ export const ZODIAC_DATA: Record<ZodiacSign, {
 
 function nameNumber(name: string): number {
   const v: Record<string, number> = {
-    a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,j:1,k:2,l:3,m:4,n:5,o:6,p:7,q:8,r:9,s:1,t:2,u:3,v:4,w:5,x:6,y:7,z:8,
+    a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 1, k: 2, l: 3, m: 4, n: 5, o: 6, p: 7, q: 8, r: 9, s: 1, t: 2, u: 3, v: 4, w: 5, x: 6, y: 7, z: 8,
   };
   let s = name.toLowerCase().split("").reduce((a, c) => a + (v[c] || 0), 0);
   while (s > 9 && s !== 11 && s !== 22) s = s.toString().split("").reduce((a, d) => a + +d, 0);
@@ -378,20 +378,35 @@ export interface PersonalReadingInput {
 }
 
 export interface PersonalReading {
+  // Core verdict & scoring
   verdict: string;
   verdictTh: string;
   verdictLevel: string;
   cosmicScore: number;
+  // Legacy flat answer (kept for backward compat)
   answer: string;
   answerTh: string;
   advice: string;
   adviceTh: string;
   warning: string;
   warningTh: string;
+  // Lucky details
   luckyNumbers: number[];
   luckyDay: string;
   luckyColor: string;
   lunarPhase: string;
+  // Rich reading sections (used by the UI)
+  greeting: string;
+  cosmicAlignment: string;
+  lunarInfluence: string;
+  timeEnergy: string;
+  seasonalWisdom: string;
+  numerologyInsight: string;
+  elementalReading: string;
+  personalAdvice: string;
+  overallEnergy: string;
+  warnings: string;
+  closingMessage: string;
 }
 
 export function generatePersonalReading(input: PersonalReadingInput): PersonalReading {
@@ -433,13 +448,26 @@ export function generatePersonalReading(input: PersonalReadingInput): PersonalRe
   const advice = advices[seed];
 
   // Warning
-  const warnings = [
+  const warningList = [
     { en: `Be mindful of ${zodiac.challenges[0]} in the coming days. The ${lunar.phase} can amplify emotional reactions.`, th: `ระวัง${zodiac.challenges[0]}ในวันต่อๆ ไป ${lunar.phase}อาจเพิ่มปฏิกิริยาทางอารมณ์` },
     { en: `Do not let ${zodiac.challenges[1] || zodiac.challenges[0]} cloud your judgment. Trust the process and stay grounded.`, th: `อย่าปล่อยให้${zodiac.challenges[1] || zodiac.challenges[0]}บดบังวิจารณญาณ เชื่อมั่นในกระบวนการและมั่นคงไว้` },
   ];
 
   const dailySeed = (now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate() + nn) % 100;
   const luckyNums = zodiac.luckyNumbers.map(n => ((n + dailySeed) % 49) + 1);
+
+  // ── Rich reading sections (fallback / static values) ──
+  const hours = now.getHours();
+  const timeLabel = hours < 6 ? "midnight" : hours < 12 ? "morning" : hours < 17 ? "afternoon" : hours < 20 ? "twilight" : "evening";
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const seasonLabel = sb >= 8 ? "summer" : sb >= 7 ? "spring" : sb >= 6 ? "twilight season" : "winter";
+
+  const greetingEn = `Dear ${input.name}, the stars have heard your question. As a ${input.zodiacSign} born under the energy of ${zodiac.ruler}, the cosmos speaks to you now.`;
+  const cosmicAlignmentEn = `Your ${input.zodiacSign} energy resonates at a cosmic score of ${score}/100 today. The ${zodiac.element} element that guides you is ${verdict.level === "very_positive" || verdict.level === "positive" ? "powerfully aligned" : "calling for patience and wisdom"}. ${verdict.label} — ${verdict.labelTh}.`;
+  const lunarInfluenceEn = `The ${lunar.phase} bathes your chart tonight, lending ${lunar.bonus >= 7 ? "strong amplifying energy" : lunar.bonus >= 5 ? "steady supportive light" : "a quiet reflective glow"}. For a ${zodiac.element} sign like yours, this lunar phase ${lunar.phase.includes("Full") ? "heightens emotion and clarity" : lunar.phase.includes("New") ? "seeds new beginnings" : "encourages careful reflection"}.`;
+  const timeEnergyEn = `You seek guidance in the ${timeLabel} hours — a time when ${timeLabel === "morning" ? "clarity and ambition peak" : timeLabel === "twilight" ? "intuition and transition energy converge" : timeLabel === "midnight" ? "the deeper subconscious speaks" : "action and reflection balance"}. Your ${zodiac.quality} nature is most receptive at this hour.`;
+  const seasonalWisdomEn = `The ${seasonLabel} season honors your ${zodiac.element} spirit. ${monthNames[now.getMonth()]} carries the vibration of ${sb >= 7 ? "growth and abundance" : sb >= 6 ? "harvest and gratitude" : "rest and inner wisdom"}. Let nature's current rhythm be your guide.`;
+  const numerologyInsightEn = `Your name resonates at numerology ${nn} — the energy of ${nn <= 3 ? "creativity and expression" : nn <= 6 ? "harmony and responsibility" : nn <= 9 ? "wisdom and transformation" : "mastery and intuition"}. Your life path number ${lp} speaks of ${lp === 1 ? "leadership" : lp === 2 ? "cooperation" : lp === 3 ? "joy" : lp === 4 ? "stability" : lp === 5 ? "freedom" : lp === 6 ? "nurturing" : lp === 7 ? "spirituality" : lp === 8 ? "power" : lp === 9 ? "compassion" : "mastery"}. Together they form a powerful signature for your current question.`;
 
   return {
     verdict: verdict.label,
@@ -450,13 +478,116 @@ export function generatePersonalReading(input: PersonalReadingInput): PersonalRe
     answerTh: answerData.answerTh,
     advice: advice.en,
     adviceTh: advice.th,
-    warning: warnings[seed % warnings.length].en,
-    warningTh: warnings[seed % warnings.length].th,
+    warning: warningList[seed % warningList.length].en,
+    warningTh: warningList[seed % warningList.length].th,
     luckyNumbers: luckyNums,
     luckyDay: zodiac.luckyDay,
     luckyColor: zodiac.color,
     lunarPhase: lunar.phase,
+    // Rich UI sections (overridden by AI when available)
+    greeting: greetingEn,
+    cosmicAlignment: cosmicAlignmentEn,
+    lunarInfluence: lunarInfluenceEn,
+    timeEnergy: timeEnergyEn,
+    seasonalWisdom: seasonalWisdomEn,
+    numerologyInsight: numerologyInsightEn,
+    elementalReading: answerData.answer,
+    personalAdvice: advice.en,
+    overallEnergy: `${verdict.label}. Your cosmic score is ${score}/100. ${score >= 65 ? "This is a favorable period to move forward." : score >= 45 ? "Proceed with mindful effort and patience." : "Pause, reflect, and let the stars realign before acting."}`,
+    warnings: warningList[seed % warningList.length].en,
+    closingMessage: `The stars have spoken for you today, ${input.name}. Trust in the cosmic timing of all things. May the energy of ${zodiac.ruler} guide your path with wisdom and grace. ✨`,
   };
+}
+
+// ─── AI-Powered Personal Reading ────────────────────────────
+// Calls the Gemini API route and merges dynamic answers into the reading.
+
+export async function generatePersonalReadingWithAI(input: PersonalReadingInput): Promise<PersonalReading> {
+  // Always generate the base reading first (preserves all existing logic)
+  const base = generatePersonalReading(input);
+
+  try {
+    const prompt = `You are a mystical celestial oracle that gives fortune readings both in English and Thai. Respond ONLY with a valid JSON object — no markdown, no explanation, no extra text.
+
+Context:
+- Seeker: ${input.name}, age ${input.age}, ${input.zodiacSign} (${ZODIAC_DATA[input.zodiacSign].element} element, ruled by ${ZODIAC_DATA[input.zodiacSign].ruler})
+- Zodiac traits: ${ZODIAC_DATA[input.zodiacSign].traits.join(", ")}
+- Zodiac strengths: ${ZODIAC_DATA[input.zodiacSign].strengths.join(", ")}
+- Zodiac challenges: ${ZODIAC_DATA[input.zodiacSign].challenges.join(", ")}
+- Cosmic score: ${base.cosmicScore}/100
+- Verdict: ${base.verdict}
+- Lunar phase: ${base.lunarPhase}
+- Lucky day: ${base.luckyDay}, Lucky color: ${base.luckyColor}
+- Concern area: ${input.concern || "general"}
+- Relationship: ${input.relationship || "not specified"}
+- Question: "${input.question}"
+
+Generate a concise, personalized fortune reading. Each field MUST be strictly 1-2 short sentences. Do NOT be verbose. Use mystical, warm, direct language. Must be unique and specific to this person's question.
+
+Return this exact JSON structure:
+{
+  "greeting": "<warm mystical personal greeting in English>",
+  "greetingTh": "<same in Thai>",
+  "cosmicAlignment": "<cosmic score & element alignment in English>",
+  "cosmicAlignmentTh": "<same in Thai>",
+  "lunarInfluence": "<how the current lunar phase affects them in English>",
+  "lunarInfluenceTh": "<same in Thai>",
+  "timeEnergy": "<energy of the time of day in English>",
+  "timeEnergyTh": "<same in Thai>",
+  "seasonalWisdom": "<seasonal cosmic wisdom in English>",
+  "seasonalWisdomTh": "<same in Thai>",
+  "numerologyInsight": "<numerology insight for this person in English>",
+  "numerologyInsightTh": "<same in Thai>",
+  "elementalReading": "<direct answer to their specific question in English — be clear and mystical>",
+  "elementalReadingTh": "<same in Thai>",
+  "personalAdvice": "<action-oriented advice in English>",
+  "personalAdviceTh": "<same in Thai>",
+  "overallEnergy": "<overall energy summary for today in English>",
+  "overallEnergyTh": "<same in Thai>",
+  "warnings": "<gentle cosmic caution in English>",
+  "warningsTh": "<same in Thai>",
+  "closingMessage": "<warm closing with their name in English>",
+  "closingMessageTh": "<same in Thai>"
+}`;
+
+    const res = await fetch("/api/fortune", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "personal", prompt }),
+    });
+
+    if (!res.ok) throw new Error("API error");
+
+    // The route returns parsed JSON, but our prompt asks for nested fields
+    // so we parse the AI text ourselves via a raw text response trick
+    const aiData = await res.json() as Record<string, string>;
+
+    // Merge AI-generated rich sections into the base reading
+    return {
+      ...base,
+      greeting: aiData.greeting || base.greeting,
+      cosmicAlignment: aiData.cosmicAlignment || base.cosmicAlignment,
+      lunarInfluence: aiData.lunarInfluence || base.lunarInfluence,
+      timeEnergy: aiData.timeEnergy || base.timeEnergy,
+      seasonalWisdom: aiData.seasonalWisdom || base.seasonalWisdom,
+      numerologyInsight: aiData.numerologyInsight || base.numerologyInsight,
+      elementalReading: aiData.elementalReading || base.elementalReading,
+      personalAdvice: aiData.personalAdvice || base.personalAdvice,
+      overallEnergy: aiData.overallEnergy || base.overallEnergy,
+      warnings: aiData.warnings || base.warnings,
+      closingMessage: aiData.closingMessage || base.closingMessage,
+      // Also update legacy fields for consistency
+      answer: aiData.elementalReading || base.answer,
+      answerTh: aiData.elementalReadingTh || base.answerTh,
+      advice: aiData.personalAdvice || base.advice,
+      adviceTh: aiData.personalAdviceTh || base.adviceTh,
+      warning: aiData.warnings || base.warning,
+      warningTh: aiData.warningsTh || base.warningTh,
+    };
+  } catch (err) {
+    console.warn("[Fortune AI] Falling back to static reading:", err);
+    return base;
+  }
 }
 
 // ─── General Horoscope ──────────────────────────────────────
@@ -471,6 +602,8 @@ export interface GeneralReading {
   period: Period;
   overview: string;
   overviewTh: string;
+  details: string;
+  detailsTh: string;
   advice: string;
   adviceTh: string;
   rating: number;
@@ -706,11 +839,17 @@ export function generateGeneralReading(
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const bestDay = period === "daily" ? "Today" : days[(seed + signIndex) % 7];
 
+  // Details: a deeper elaboration on the overview
+  const detailsEn = `As a ${zodiacSign} guided by ${zodiac.ruler}, your ${zodiac.element} energy shapes this ${period} ${category} reading. ${overview} ${advices.en[seed % advices.en.length]}`;
+  const detailsTh = `ในฐานะ${zodiacSign}ที่ได้รับการนำทางจาก${zodiac.ruler} พลัง${zodiac.element}ของคุณกำหนดการอ่านดวง${category}${period}นี้ ${overviewTh} ${advices.th[seed % advices.th.length]}`;
+
   return {
     title: `${periodLabel} ${categoryLabel} Reading for ${zodiacSign}`,
     zodiacSign, category, period,
     overview,
     overviewTh,
+    details: detailsEn,
+    detailsTh,
     advice: advices.en[seed % advices.en.length],
     adviceTh: advices.th[seed % advices.th.length],
     rating,
@@ -721,4 +860,72 @@ export function generateGeneralReading(
     affirmation: affs.en[seed % affs.en.length],
     affirmationTh: affs.th[seed % affs.th.length],
   };
+}
+
+// ─── AI-Powered General Reading ─────────────────────────────
+// Calls the Gemini API route and merges dynamic text into the reading.
+
+export async function generateGeneralReadingWithAI(
+  zodiacSign: ZodiacSign, category: Category, period: Period,
+): Promise<GeneralReading> {
+  // Always generate the base reading first (preserves all existing logic)
+  const base = generateGeneralReading(zodiacSign, category, period);
+  const zodiac = ZODIAC_DATA[zodiacSign];
+
+  try {
+    const prompt = `You are a mystical celestial oracle. Respond ONLY with a valid JSON object — no markdown, no explanation.
+
+Generate a ${period} ${category} horoscope reading for ${zodiacSign}.
+
+Context:
+- Sign: ${zodiacSign} (${zodiac.element} element, ${zodiac.quality} quality, ruled by ${zodiac.ruler})
+- Traits: ${zodiac.traits.join(", ")}
+- Strengths: ${zodiac.strengths.join(", ")}
+- Challenges: ${zodiac.challenges.join(", ")}
+- Category: ${category} | Period: ${period}
+- Cosmic rating: ${base.rating}/5
+
+Each field: strictly 1-2 short sentences. Do NOT be verbose. Mystical, warm, direct tone.
+
+Return this exact JSON:
+{
+  "overview": "<vivid ${period} ${category} overview in English>",
+  "overviewTh": "<same in Thai>",
+  "details": "<deeper elaboration in English>",
+  "detailsTh": "<same in Thai>",
+  "advice": "<practical cosmic advice in English>",
+  "adviceTh": "<same in Thai>",
+  "caution": "<gentle caution in English>",
+  "cautionTh": "<same in Thai>",
+  "affirmation": "<powerful affirmation in English>",
+  "affirmationTh": "<same in Thai>"
+}`;
+
+    const res = await fetch("/api/fortune", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "general", prompt }),
+    });
+
+    if (!res.ok) throw new Error("API error");
+
+    const aiData = await res.json() as Record<string, string>;
+
+    return {
+      ...base,
+      overview: aiData.overview || base.overview,
+      overviewTh: aiData.overviewTh || base.overviewTh,
+      details: aiData.details || base.details,
+      detailsTh: aiData.detailsTh || base.detailsTh,
+      advice: aiData.advice || base.advice,
+      adviceTh: aiData.adviceTh || base.adviceTh,
+      caution: aiData.caution || base.caution,
+      cautionTh: aiData.cautionTh || base.cautionTh,
+      affirmation: aiData.affirmation || base.affirmation,
+      affirmationTh: aiData.affirmationTh || base.affirmationTh,
+    };
+  } catch (err) {
+    console.warn("[Fortune AI] Falling back to static general reading:", err);
+    return base;
+  }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ZODIAC_SIGNS, ZODIAC_DATA, generatePersonalReading } from "@/lib/fortune-engine";
+import { ZODIAC_SIGNS, ZODIAC_DATA, generatePersonalReadingWithAI } from "@/lib/fortune-engine";
 import type { ZodiacSign, PersonalReading } from "@/lib/fortune-engine";
 import { ZodiacIcon } from "./zodiac-icon";
 import { useLanguage } from "@/lib/language-context";
@@ -24,38 +24,48 @@ export function PersonalReadingSection() {
   const [reading, setReading] = useState<PersonalReading | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.zodiacSign || !formData.question || !formData.birthDate || !formData.age) return;
 
     setIsRevealing(true);
     setShowResult(false);
+    setError(null);
 
-    setTimeout(() => {
+    try {
       // Enrich the question with context from concern, relationship, and occupation
       let enrichedQuestion = formData.question;
       if (formData.concern) enrichedQuestion += ` [concern: ${formData.concern}]`;
       if (formData.relationship) enrichedQuestion += ` [relationship: ${formData.relationship}]`;
       if (formData.occupation) enrichedQuestion += ` [occupation: ${formData.occupation}]`;
 
-      const result = generatePersonalReading({
+      const result = await generatePersonalReadingWithAI({
         name: formData.name,
         age: parseInt(formData.age),
         zodiacSign: formData.zodiacSign as ZodiacSign,
         birthDate: formData.birthDate,
         gender: formData.gender,
         question: enrichedQuestion,
+        relationship: formData.relationship,
+        occupation: formData.occupation,
+        concern: formData.concern,
       });
       setReading(result);
-      setIsRevealing(false);
       setShowResult(true);
-    }, 2500);
+    } catch (err) {
+      setError("The cosmos could not be reached. Please try again.");
+      console.error(err);
+    } finally {
+      setIsRevealing(false);
+    }
   };
 
   const resetForm = () => {
     setShowResult(false);
     setReading(null);
+    setError(null);
   };
 
   return (
@@ -191,6 +201,19 @@ export function PersonalReadingSection() {
           </div>
         )}
 
+        {/* Error State */}
+        {error && !isRevealing && (
+          <div className="flex flex-col items-center justify-center py-12 animate-fade-in-up">
+            <p className="font-serif text-lg text-destructive text-center">{error}</p>
+            <button
+              onClick={resetForm}
+              className="mt-4 px-6 py-2 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all"
+            >
+              {t("personal.ask_again")}
+            </button>
+          </div>
+        )}
+
         {/* Revealing Animation */}
         {isRevealing && (
           <div className="flex flex-col items-center justify-center py-20 animate-fade-in-up">
@@ -207,7 +230,7 @@ export function PersonalReadingSection() {
         )}
 
         {/* Input Form */}
-        {!showResult && !isRevealing && (
+        {!showResult && !isRevealing && !error && (
           <form onSubmit={handleSubmit} className="animate-fade-in-up">
             <div className="reading-result rounded-2xl p-8 md:p-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -332,11 +355,10 @@ export function PersonalReadingSection() {
                         key={item.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, concern: item.value })}
-                        className={`px-3 py-2.5 rounded-lg border text-sm font-serif transition-all text-center ${
-                          formData.concern === item.value
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                        }`}
+                        className={`px-3 py-2.5 rounded-lg border text-sm font-serif transition-all text-center ${formData.concern === item.value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                          }`}
                       >
                         {item.label}
                       </button>
@@ -355,11 +377,10 @@ export function PersonalReadingSection() {
                         key={sign}
                         type="button"
                         onClick={() => setFormData({ ...formData, zodiacSign: sign })}
-                        className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all ${
-                          formData.zodiacSign === sign
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                        }`}
+                        className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all ${formData.zodiacSign === sign
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                          }`}
                       >
                         <ZodiacIcon sign={sign} size={28} />
                         <span className="text-xs font-sans">{sign}</span>

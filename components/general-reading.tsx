@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ZODIAC_SIGNS, ZODIAC_DATA, generateGeneralReading } from "@/lib/fortune-engine";
+import { ZODIAC_SIGNS, ZODIAC_DATA, generateGeneralReadingWithAI } from "@/lib/fortune-engine";
 import type { ZodiacSign, Category, Period, GeneralReading } from "@/lib/fortune-engine";
 import { ZodiacIcon } from "./zodiac-icon";
 import { useLanguage } from "@/lib/language-context";
@@ -30,19 +30,25 @@ export function GeneralReadingSection() {
   const [isRevealing, setIsRevealing] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!selectedSign || !selectedCategory || !selectedPeriod) return;
 
     setIsRevealing(true);
     setShowResult(false);
+    setError(null);
 
-    setTimeout(() => {
-      const result = generateGeneralReading(selectedSign, selectedCategory, selectedPeriod);
+    try {
+      const result = await generateGeneralReadingWithAI(selectedSign, selectedCategory, selectedPeriod);
       setReading(result);
-      setIsRevealing(false);
       setShowResult(true);
-    }, 2000);
+    } catch (err) {
+      setError("The stars could not be reached. Please try again.");
+      console.error(err);
+    } finally {
+      setIsRevealing(false);
+    }
   };
 
   const reset = () => {
@@ -52,6 +58,7 @@ export function GeneralReadingSection() {
     setSelectedSign("");
     setSelectedCategory("");
     setSelectedPeriod("");
+    setError(null);
   };
 
   return (
@@ -160,6 +167,19 @@ export function GeneralReadingSection() {
           </div>
         )}
 
+        {/* Error State */}
+        {error && !isRevealing && (
+          <div className="flex flex-col items-center justify-center py-12 animate-fade-in-up">
+            <p className="font-serif text-lg text-destructive text-center">{error}</p>
+            <button
+              onClick={reset}
+              className="mt-4 px-6 py-2 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all"
+            >
+              {t("general.new_reading")}
+            </button>
+          </div>
+        )}
+
         {/* Loading */}
         {isRevealing && (
           <div className="flex flex-col items-center justify-center py-20 animate-fade-in-up">
@@ -183,11 +203,10 @@ export function GeneralReadingSection() {
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center gap-2">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-sans text-sm transition-all ${
-                      step >= s
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-sans text-sm transition-all ${step >= s
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-muted-foreground border border-border"
-                    }`}
+                      }`}
                   >
                     {s}
                   </div>
@@ -213,11 +232,10 @@ export function GeneralReadingSection() {
                         setSelectedSign(sign);
                         setStep(2);
                       }}
-                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all hover:scale-105 ${
-                        selectedSign === sign
+                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all hover:scale-105 ${selectedSign === sign
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <ZodiacIcon sign={sign} size={32} />
                       <span className="text-xs font-sans">{sign}</span>
@@ -246,15 +264,13 @@ export function GeneralReadingSection() {
                         setSelectedCategory(cat.id);
                         setStep(3);
                       }}
-                      className={`flex flex-col items-center gap-3 p-6 rounded-xl border transition-all hover:scale-105 ${
-                        selectedCategory === cat.id
+                      className={`flex flex-col items-center gap-3 p-6 rounded-xl border transition-all hover:scale-105 ${selectedCategory === cat.id
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                      }`}
+                        }`}
                     >
-                      <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                        selectedCategory === cat.id ? "bg-primary/20" : "bg-secondary"
-                      }`}>
+                      <div className={`w-14 h-14 rounded-full flex items-center justify-center ${selectedCategory === cat.id ? "bg-primary/20" : "bg-secondary"
+                        }`}>
                         {cat.icon}
                       </div>
                       <span className="font-sans text-lg">{cat.label}</span>
@@ -288,11 +304,10 @@ export function GeneralReadingSection() {
                       key={per.id}
                       type="button"
                       onClick={() => setSelectedPeriod(per.id)}
-                      className={`flex flex-col items-center gap-2 p-5 rounded-xl border transition-all hover:scale-105 ${
-                        selectedPeriod === per.id
+                      className={`flex flex-col items-center gap-2 p-5 rounded-xl border transition-all hover:scale-105 ${selectedPeriod === per.id
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <span className="font-sans text-lg">{per.label}</span>
                       <span className="text-xs text-muted-foreground font-serif">{per.description}</span>
