@@ -115,6 +115,40 @@ export const ZODIAC_DATA: Record<ZodiacSign, {
 
 // ─── Helpers ────────────────────────────────────────────────
 
+export function getZodiacSign(birthDate: string): ZodiacSign {
+  // birthDate format is YYYY-MM-DD
+  const date = new Date(birthDate);
+  // Ensure we correctly parse the day and month
+  // Using UTC to avoid timezone shift on local parse
+  const m = date.getUTCMonth() + 1;
+  const d = date.getUTCDate();
+
+  if ((m === 3 && d >= 21) || (m === 4 && d <= 19)) return "Aries";
+  if ((m === 4 && d >= 20) || (m === 5 && d <= 20)) return "Taurus";
+  if ((m === 5 && d >= 21) || (m === 6 && d <= 20)) return "Gemini";
+  if ((m === 6 && d >= 21) || (m === 7 && d <= 22)) return "Cancer";
+  if ((m === 7 && d >= 23) || (m === 8 && d <= 22)) return "Leo";
+  if ((m === 8 && d >= 23) || (m === 9 && d <= 22)) return "Virgo";
+  if ((m === 9 && d >= 23) || (m === 10 && d <= 22)) return "Libra";
+  if ((m === 10 && d >= 23) || (m === 11 && d <= 21)) return "Scorpio";
+  if ((m === 11 && d >= 22) || (m === 12 && d <= 21)) return "Sagittarius";
+  if ((m === 12 && d >= 22) || (m === 1 && d <= 19)) return "Capricorn";
+  if ((m === 1 && d >= 20) || (m === 2 && d <= 18)) return "Aquarius";
+  return "Pisces"; // Feb 19 - Mar 20
+}
+
+export function calculateAge(birthDate: string): number {
+  const bd = new Date(birthDate);
+  const now = new Date();
+  let age = now.getUTCFullYear() - bd.getUTCFullYear();
+  const m = now.getUTCMonth() - bd.getUTCMonth();
+  if (m < 0 || (m === 0 && now.getUTCDate() < bd.getUTCDate())) {
+    age--;
+  }
+  return age;
+}
+
+
 function nameNumber(name: string): number {
   const v: Record<string, number> = {
     a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 1, k: 2, l: 3, m: 4, n: 5, o: 6, p: 7, q: 8, r: 9, s: 1, t: 2, u: 3, v: 4, w: 5, x: 6, y: 7, z: 8,
@@ -205,9 +239,9 @@ function detectQuestionType(q: string): QuestionType {
 
 // ─── Topic Detection ────────────────────────────────────────
 
-type Topic = "love" | "career" | "education" | "health" | "finance" | "family" | "spiritual" | "general";
+export type Topic = "love" | "career" | "education" | "health" | "finance" | "family" | "spiritual" | "general";
 
-function detectTopic(q: string, concern: string): Topic {
+export function detectTopic(q: string, concern: string): Topic {
   const lower = q.toLowerCase() + " " + concern.toLowerCase();
   const topics: [Topic, RegExp[]][] = [
     ["education", [/\bexam\b/i, /\bstudy\b/i, /\bpass\b/i, /\btest\b/i, /\bschool\b/i, /\buniversity\b/i, /\bgrade\b/i, /\bdegree\b/i, /\bclass\b/i, /\bสอบ/i, /\bเรียน/i, /\bมหาวิทยาลัย/i]],
@@ -231,7 +265,7 @@ function calculateCosmicScore(input: {
   nameNum: number; lifePath: number; lunarBonus: number;
   timeB: number; seasonB: number; signIndex: number;
   element: string; topic: Topic; concern: string;
-  age: number; relationship: string;
+  age: number; birthPlace: string;
 }): number {
   const { nameNum, lifePath, lunarBonus, timeB, seasonB, signIndex, element, topic, age } = input;
 
@@ -265,9 +299,9 @@ function calculateCosmicScore(input: {
   return Math.min(100, Math.max(5, Math.round(total)));
 }
 
-// ─── Verdict Generator ──────────────────────────────────────
+export // ─── Verdict Generator ──────────────────────────────────────
 
-interface Verdict {
+  interface Verdict {
   label: string;     // e.g. "Highly Likely", "Favorable"
   labelTh: string;
   emoji: string;     // for internal use mapping
@@ -372,12 +406,21 @@ function generateOpenAnswer(score: number, topic: Topic, zodiac: typeof ZODIAC_D
 // ─── Personal Reading ───────────────────────────────────────
 
 export interface PersonalReadingInput {
-  name: string; age: number; zodiacSign: ZodiacSign;
-  birthDate: string; gender: string; question: string;
-  relationship?: string; occupation?: string; concern?: string;
+  name: string;
+  birthDate: string; // YYYY-MM-DD
+  gender?: string;
+  question: string;
+  age?: number;               // Now optional, auto-calculated if missing
+  zodiacSign?: ZodiacSign;    // Now optional, auto-calculated if missing
+  birthPlace?: string;
+  occupation?: string;
+  concern?: string;
 }
 
 export interface PersonalReading {
+  // Calculated metadata
+  age: number;
+  zodiacSign: ZodiacSign;
   // Core verdict & scoring
   verdict: string;
   verdictTh: string;
@@ -394,6 +437,8 @@ export interface PersonalReading {
   luckyNumbers: number[];
   luckyDay: string;
   luckyColor: string;
+  luckyDayTh: string;
+  luckyColorTh: string;
   lunarPhase: string;
   // Rich reading sections (used by the UI)
   greeting: string;
@@ -410,22 +455,35 @@ export interface PersonalReading {
 }
 
 export function generatePersonalReading(input: PersonalReadingInput): PersonalReading {
+  // Auto-calculate missing essential inputs from birthDate
+  const age = input.age ?? calculateAge(input.birthDate);
+  const zodiacSign = input.zodiacSign ?? getZodiacSign(input.birthDate);
+
+  const bd = new Date(input.birthDate);
   const now = new Date();
-  const zodiac = ZODIAC_DATA[input.zodiacSign];
-  const nn = nameNumber(input.name);
-  const lp = lifePathNumber(new Date(input.birthDate));
-  const lunar = lunarPhase(now);
-  const tb = timeBonus(now.getHours());
-  const sb = seasonBonus(now.getMonth());
-  const signIndex = ZODIAC_SIGNS.indexOf(input.zodiacSign);
+
+  // Basic numerology setup
+  const nameNum = nameNumber(input.name);
+  const lifePath = lifePathNumber(bd);
+
+  // Time & Space mechanics
+  const hours = now.getHours();
+  const timeB = timeBonus(hours);
+  const seasonB = seasonBonus(now.getMonth() + 1);
+  const { phase, bonus: lunarBonus } = lunarPhase(now);
+
+  const signIndex = ZODIAC_SIGNS.indexOf(zodiacSign);
+  const zodiac = ZODIAC_DATA[zodiacSign];
+
+  // NLP - Question Parsing
   const topic = detectTopic(input.question, input.concern || "");
   const qType = detectQuestionType(input.question);
 
+  // The Magic Algorithm
   const score = calculateCosmicScore({
-    nameNum: nn, lifePath: lp, lunarBonus: lunar.bonus,
-    timeB: tb, seasonB: sb, signIndex, element: zodiac.element,
-    topic, concern: input.concern || "", age: input.age,
-    relationship: input.relationship || "",
+    nameNum, lifePath, lunarBonus, timeB, seasonB,
+    signIndex, element: zodiac.element, topic, concern: input.concern || "",
+    age, birthPlace: input.birthPlace || ""
   });
 
   const verdict = getVerdict(score);
@@ -438,38 +496,42 @@ export function generatePersonalReading(input: PersonalReadingInput): PersonalRe
     answerData = generateOpenAnswer(score, topic, zodiac);
   }
 
+
   // Advice
   const advices = [
     { en: `Your ${zodiac.strengths[0]} is your greatest asset right now. Lean into it and watch for your tendency toward ${zodiac.challenges[0]} which could hold you back.`, th: `${zodiac.strengths[0]}ของคุณคือทรัพย์สินที่ดีที่สุดในตอนนี้ พึ่งพามันและระวังนิสัย${zodiac.challenges[0]}ที่อาจฉุดรั้งคุณ` },
-    { en: `${zodiac.ruler} guides you toward using your ${zodiac.traits[1]} nature. The ${lunar.phase} amplifies intuition - trust your gut feelings in the coming days.`, th: `${zodiac.ruler}นำทางคุณให้ใช้ความ${zodiac.traits[1]}ของตัวเอง ${lunar.phase}เพิ่มพลังสัญชาตญาณ เชื่อใจความรู้สึกภายในในวันต่อๆ ไป` },
+    { en: `${zodiac.ruler} guides you toward using your ${zodiac.traits[1]} nature. The ${phase} amplifies intuition - trust your gut feelings in the coming days.`, th: `${zodiac.ruler}นำทางคุณให้ใช้ความ${zodiac.traits[1]}ของตัวเอง ${phase}เพิ่มพลังสัญชาตญาณ เชื่อใจความรู้สึกภายในในวันต่อๆ ไป` },
     { en: `Focus on what you can control. Your ${zodiac.quality.toLowerCase()} energy helps you ${zodiac.quality === "Cardinal" ? "start new paths" : zodiac.quality === "Fixed" ? "stay the course" : "adapt to changes"}. Small consistent steps will bring the biggest results.`, th: `เน้นที่สิ่งที่คุณควบคุมได้ พลัง${zodiac.quality}ช่วยให้คุณ${zodiac.quality === "Cardinal" ? "เริ่มเส้นทางใหม่" : zodiac.quality === "Fixed" ? "มุ่งมั่นในเส้นทาง" : "ปรับตัวกับการเปลี่ยนแปลง"} ก้าวเล็กๆ สม่ำเสมอจะนำมาซึ่งผลลัพธ์ที่ยิ่งใหญ่ที่สุด` },
   ];
-  const seed = (nn + lp + signIndex + now.getDate()) % advices.length;
+  const seed = (nameNum + lifePath + signIndex + now.getDate()) % advices.length;
   const advice = advices[seed];
 
   // Warning
   const warningList = [
-    { en: `Be mindful of ${zodiac.challenges[0]} in the coming days. The ${lunar.phase} can amplify emotional reactions.`, th: `ระวัง${zodiac.challenges[0]}ในวันต่อๆ ไป ${lunar.phase}อาจเพิ่มปฏิกิริยาทางอารมณ์` },
+    { en: `Be mindful of ${zodiac.challenges[0]} in the coming days. The ${phase} can amplify emotional reactions.`, th: `ระวัง${zodiac.challenges[0]}ในวันต่อๆ ไป ${phase}อาจเพิ่มปฏิกิริยาทางอารมณ์` },
     { en: `Do not let ${zodiac.challenges[1] || zodiac.challenges[0]} cloud your judgment. Trust the process and stay grounded.`, th: `อย่าปล่อยให้${zodiac.challenges[1] || zodiac.challenges[0]}บดบังวิจารณญาณ เชื่อมั่นในกระบวนการและมั่นคงไว้` },
   ];
 
-  const dailySeed = (now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate() + nn) % 100;
+  const dailySeed = (now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate() + nameNum) % 100;
   const luckyNums = zodiac.luckyNumbers.map(n => ((n + dailySeed) % 49) + 1);
 
   // ── Rich reading sections (fallback / static values) ──
-  const hours = now.getHours();
   const timeLabel = hours < 6 ? "midnight" : hours < 12 ? "morning" : hours < 17 ? "afternoon" : hours < 20 ? "twilight" : "evening";
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const seasonLabel = sb >= 8 ? "summer" : sb >= 7 ? "spring" : sb >= 6 ? "twilight season" : "winter";
+  const seasonLabel = seasonB >= 8 ? "summer" : seasonB >= 7 ? "spring" : seasonB >= 6 ? "twilight season" : "winter";
 
-  const greetingEn = `Dear ${input.name}, the stars have heard your question. As a ${input.zodiacSign} born under the energy of ${zodiac.ruler}, the cosmos speaks to you now.`;
-  const cosmicAlignmentEn = `Your ${input.zodiacSign} energy resonates at a cosmic score of ${score}/100 today. The ${zodiac.element} element that guides you is ${verdict.level === "very_positive" || verdict.level === "positive" ? "powerfully aligned" : "calling for patience and wisdom"}. ${verdict.label} — ${verdict.labelTh}.`;
-  const lunarInfluenceEn = `The ${lunar.phase} bathes your chart tonight, lending ${lunar.bonus >= 7 ? "strong amplifying energy" : lunar.bonus >= 5 ? "steady supportive light" : "a quiet reflective glow"}. For a ${zodiac.element} sign like yours, this lunar phase ${lunar.phase.includes("Full") ? "heightens emotion and clarity" : lunar.phase.includes("New") ? "seeds new beginnings" : "encourages careful reflection"}.`;
-  const timeEnergyEn = `You seek guidance in the ${timeLabel} hours — a time when ${timeLabel === "morning" ? "clarity and ambition peak" : timeLabel === "twilight" ? "intuition and transition energy converge" : timeLabel === "midnight" ? "the deeper subconscious speaks" : "action and reflection balance"}. Your ${zodiac.quality} nature is most receptive at this hour.`;
-  const seasonalWisdomEn = `The ${seasonLabel} season honors your ${zodiac.element} spirit. ${monthNames[now.getMonth()]} carries the vibration of ${sb >= 7 ? "growth and abundance" : sb >= 6 ? "harvest and gratitude" : "rest and inner wisdom"}. Let nature's current rhythm be your guide.`;
-  const numerologyInsightEn = `Your name resonates at numerology ${nn} — the energy of ${nn <= 3 ? "creativity and expression" : nn <= 6 ? "harmony and responsibility" : nn <= 9 ? "wisdom and transformation" : "mastery and intuition"}. Your life path number ${lp} speaks of ${lp === 1 ? "leadership" : lp === 2 ? "cooperation" : lp === 3 ? "joy" : lp === 4 ? "stability" : lp === 5 ? "freedom" : lp === 6 ? "nurturing" : lp === 7 ? "spirituality" : lp === 8 ? "power" : lp === 9 ? "compassion" : "mastery"}. Together they form a powerful signature for your current question.`;
+  const greetingEn = `Dear ${input.name}, the stars have heard your question. As a ${zodiacSign} born under the energy of ${zodiac.ruler}, the cosmos speaks to you now.`;
+  const cosmicAlignmentEn = `Your ${zodiacSign} energy resonates at a cosmic score of ${score}/100 today. The ${zodiac.element} element that guides you is ${verdict.level === "very_positive" || verdict.level === "positive" ? "powerfully aligned" : "calling for patience and wisdom"}. ${verdict.label} — ${verdict.labelTh}.`;
+
+  const lunarInfluenceEn = `The current moon phase is ${phase}. This brings an energy bonus of +${lunarBonus} to your reading. This is a time of ${phase === "Full Moon" || phase.includes("Waxing") ? "growth and clarity" : "reflection and release"}.`;
+
+  const timeEnergyEn = `The ${timeLabel} energy surrounding your reading shifts your cosmic balance, opening new channels of perception.`;
+  const seasonalWisdomEn = `As we move through the ${seasonLabel}, the natural cycles mirror your current path, suggesting you ${score > 50 ? "push forward with confidence" : "conserve energy for the right moment"}.`;
+
+  const numerologyInsightEn = `Your name number (${nameNum}) combined with your life path (${lifePath}) creates a strong resonance with the number ${lifePath + nameNum > 9 ? (lifePath + nameNum) % 9 + 1 : lifePath + nameNum}. This number often signifies a moment of karmic significance in matters like ${topic}.`;
 
   return {
+    age,
+    zodiacSign,
     verdict: verdict.label,
     verdictTh: verdict.labelTh,
     verdictLevel: verdict.level,
@@ -483,7 +545,9 @@ export function generatePersonalReading(input: PersonalReadingInput): PersonalRe
     luckyNumbers: luckyNums,
     luckyDay: zodiac.luckyDay,
     luckyColor: zodiac.color,
-    lunarPhase: lunar.phase,
+    luckyDayTh: zodiac.luckyDay, // fallback
+    luckyColorTh: zodiac.color,  // fallback
+    lunarPhase: phase,
     // Rich UI sections (overridden by AI when available)
     greeting: greetingEn,
     cosmicAlignment: cosmicAlignmentEn,
@@ -506,20 +570,21 @@ export async function generatePersonalReadingWithAI(input: PersonalReadingInput)
   // Always generate the base reading first (preserves all existing logic)
   const base = generatePersonalReading(input);
 
+  // Re-calculate local variables needed for context since they were pulled out
+  const age = input.age ?? calculateAge(input.birthDate);
+  const zodiacSign = input.zodiacSign ?? getZodiacSign(input.birthDate);
+  const zodiac = ZODIAC_DATA[zodiacSign];
+
   try {
     const prompt = `You are a mystical celestial oracle that gives fortune readings both in English and Thai. Respond ONLY with a valid JSON object — no markdown, no explanation, no extra text.
 
 Context:
-- Seeker: ${input.name}, age ${input.age}, ${input.zodiacSign} (${ZODIAC_DATA[input.zodiacSign].element} element, ruled by ${ZODIAC_DATA[input.zodiacSign].ruler})
-- Zodiac traits: ${ZODIAC_DATA[input.zodiacSign].traits.join(", ")}
-- Zodiac strengths: ${ZODIAC_DATA[input.zodiacSign].strengths.join(", ")}
-- Zodiac challenges: ${ZODIAC_DATA[input.zodiacSign].challenges.join(", ")}
-- Cosmic score: ${base.cosmicScore}/100
-- Verdict: ${base.verdict}
-- Lunar phase: ${base.lunarPhase}
-- Lucky day: ${base.luckyDay}, Lucky color: ${base.luckyColor}
-- Concern area: ${input.concern || "general"}
-- Relationship: ${input.relationship || "not specified"}
+- Seeker: ${input.name}, age ${age}, ${zodiacSign} (${zodiac.element} element, ruled by ${zodiac.ruler})
+- Question Topic: ${detectTopic(input.question, input.concern || "") || "general"}
+- Cosmic Verdict: ${base.verdictLevel} (${base.cosmicScore}/100)
+- Current Lunar Phase: ${base.lunarPhase}
+- Concern: ${input.concern || "not specified"}
+- Birth Place: ${input.birthPlace || "not specified"}
 - Question: "${input.question}"
 
 Generate a concise, personalized fortune reading. Each field MUST be strictly 1-2 short sentences. Do NOT be verbose. Use mystical, warm, direct language. Must be unique and specific to this person's question.
@@ -544,10 +609,16 @@ Return this exact JSON structure:
   "personalAdviceTh": "<same in Thai>",
   "overallEnergy": "<overall energy summary for today in English>",
   "overallEnergyTh": "<same in Thai>",
+  "overallEnergyTh": "<same in Thai>",
   "warnings": "<gentle cosmic caution in English>",
   "warningsTh": "<same in Thai>",
   "closingMessage": "<warm closing with their name in English>",
-  "closingMessageTh": "<same in Thai>"
+  "closingMessageTh": "<same in Thai>",
+  "luckyNumbers": [7, 14, 21],
+  "luckyDay": "<Lucky day of the week in English>",
+  "luckyDayTh": "<Same in Thai>",
+  "luckyColor": "<Lucky color in English>",
+  "luckyColorTh": "<Same in Thai>"
 }`;
 
     const res = await fetch("/api/fortune", {
@@ -560,7 +631,7 @@ Return this exact JSON structure:
 
     // The route returns parsed JSON, but our prompt asks for nested fields
     // so we parse the AI text ourselves via a raw text response trick
-    const aiData = await res.json() as Record<string, string>;
+    const aiData = await res.json() as Record<string, any>;
 
     // Merge AI-generated rich sections into the base reading
     return {
@@ -576,6 +647,11 @@ Return this exact JSON structure:
       overallEnergy: aiData.overallEnergy || base.overallEnergy,
       warnings: aiData.warnings || base.warnings,
       closingMessage: aiData.closingMessage || base.closingMessage,
+      luckyNumbers: Array.isArray(aiData.luckyNumbers) ? aiData.luckyNumbers : base.luckyNumbers,
+      luckyDay: aiData.luckyDay || base.luckyDay,
+      luckyDayTh: aiData.luckyDayTh || base.luckyDayTh,
+      luckyColor: aiData.luckyColor || base.luckyColor,
+      luckyColorTh: aiData.luckyColorTh || base.luckyColorTh,
       // Also update legacy fields for consistency
       answer: aiData.elementalReading || base.answer,
       answerTh: aiData.elementalReadingTh || base.answerTh,

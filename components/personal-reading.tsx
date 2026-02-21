@@ -8,15 +8,13 @@ import { useLanguage } from "@/lib/language-context";
 import { Star, Sparkles, Moon, Sun, Hash, Calendar, ShieldAlert, MessageCircle } from "lucide-react";
 
 export function PersonalReadingSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const [formData, setFormData] = useState({
     name: "",
-    age: "",
-    zodiacSign: "" as ZodiacSign | "",
     birthDate: "",
     gender: "",
-    relationship: "",
+    birthPlace: "",
     occupation: "",
     concern: "",
     question: "",
@@ -28,7 +26,7 @@ export function PersonalReadingSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.zodiacSign || !formData.question || !formData.birthDate || !formData.age) return;
+    if (!formData.name || !formData.question || !formData.birthDate) return;
 
     setIsRevealing(true);
     setShowResult(false);
@@ -38,17 +36,15 @@ export function PersonalReadingSection() {
       // Enrich the question with context from concern, relationship, and occupation
       let enrichedQuestion = formData.question;
       if (formData.concern) enrichedQuestion += ` [concern: ${formData.concern}]`;
-      if (formData.relationship) enrichedQuestion += ` [relationship: ${formData.relationship}]`;
+      if (formData.birthPlace) enrichedQuestion += ` [birth place: ${formData.birthPlace}]`;
       if (formData.occupation) enrichedQuestion += ` [occupation: ${formData.occupation}]`;
 
       const result = await generatePersonalReadingWithAI({
         name: formData.name,
-        age: parseInt(formData.age),
-        zodiacSign: formData.zodiacSign as ZodiacSign,
         birthDate: formData.birthDate,
         gender: formData.gender,
         question: enrichedQuestion,
-        relationship: formData.relationship,
+        birthPlace: formData.birthPlace,
         occupation: formData.occupation,
         concern: formData.concern,
       });
@@ -92,7 +88,7 @@ export function PersonalReadingSection() {
               {/* Header */}
               <div className="text-center mb-8">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center animate-glow-pulse">
-                  <ZodiacIcon sign={formData.zodiacSign as string} size={40} className="text-primary" />
+                  <ZodiacIcon sign={reading.zodiacSign as string} size={40} className="text-primary" />
                 </div>
                 <h3 className="text-2xl font-sans gold-text mb-2">{t("personal.result_title")}</h3>
                 <p className="text-muted-foreground font-serif italic">
@@ -135,19 +131,6 @@ export function PersonalReadingSection() {
                   content={reading.numerologyInsight}
                 />
 
-                {/* Main answer */}
-                <div className="p-6 rounded-xl border-2 border-primary/30 bg-primary/5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <MessageCircle className="w-5 h-5 text-primary" />
-                    <h4 className="font-sans text-lg text-primary tracking-wide">
-                      {t("personal.answer")}
-                    </h4>
-                  </div>
-                  <p className="font-serif text-lg text-foreground leading-relaxed">
-                    {reading.elementalReading}
-                  </p>
-                </div>
-
                 <ReadingBlock
                   icon={<Star className="w-5 h-5 text-primary" />}
                   title={t("personal.advice")}
@@ -165,6 +148,19 @@ export function PersonalReadingSection() {
                 />
               </div>
 
+              {/* Main answer */}
+              <div className="mt-8 p-6 rounded-xl border-2 border-primary/30 bg-primary/5 shadow-[0_0_15px_rgba(201,168,76,0.15)]">
+                <div className="flex items-center gap-3 mb-3">
+                  <MessageCircle className="w-5 h-5 text-primary" />
+                  <h4 className="font-sans text-lg text-primary tracking-wide">
+                    {t("personal.answer")}
+                  </h4>
+                </div>
+                <p className="font-serif text-lg text-foreground leading-relaxed">
+                  {reading.elementalReading}
+                </p>
+              </div>
+
               {/* Lucky Details */}
               <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 rounded-xl bg-secondary/50 border border-primary/10 text-center">
@@ -173,11 +169,11 @@ export function PersonalReadingSection() {
                 </div>
                 <div className="p-4 rounded-xl bg-secondary/50 border border-primary/10 text-center">
                   <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{t("personal.lucky_day")}</p>
-                  <p className="font-sans text-primary text-lg">{reading.luckyDay}</p>
+                  <p className="font-sans text-primary text-lg">{lang === "th" ? reading.luckyDayTh : reading.luckyDay}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-secondary/50 border border-primary/10 text-center">
                   <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{t("personal.lucky_color")}</p>
-                  <p className="font-sans text-primary text-lg">{reading.luckyColor}</p>
+                  <p className="font-sans text-primary text-lg">{lang === "th" ? reading.luckyColorTh : reading.luckyColor}</p>
                 </div>
               </div>
 
@@ -250,24 +246,6 @@ export function PersonalReadingSection() {
                   />
                 </div>
 
-                {/* Age */}
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="age" className="font-sans text-sm text-muted-foreground uppercase tracking-widest">
-                    {t("personal.age")}
-                  </label>
-                  <input
-                    id="age"
-                    type="number"
-                    required
-                    min={1}
-                    max={120}
-                    placeholder={t("personal.age_placeholder")}
-                    value={formData.age}
-                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground font-serif placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                  />
-                </div>
-
                 {/* Birth Date */}
                 <div className="flex flex-col gap-2">
                   <label htmlFor="birthDate" className="font-sans text-sm text-muted-foreground uppercase tracking-widest">
@@ -279,7 +257,7 @@ export function PersonalReadingSection() {
                     required
                     value={formData.birthDate}
                     onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground font-serif placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                    className={`w-full px-4 py-3 rounded-lg bg-secondary border border-border font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none ${!formData.birthDate ? "text-muted-foreground/50" : "text-foreground"}`}
                   />
                 </div>
 
@@ -292,7 +270,7 @@ export function PersonalReadingSection() {
                     id="gender"
                     value={formData.gender}
                     onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                    className={`w-full px-4 py-3 rounded-lg bg-secondary border border-border font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none ${!formData.gender ? "text-muted-foreground/50" : "text-foreground"}`}
                   >
                     <option value="">{t("personal.gender_select")}</option>
                     <option value="female">{t("personal.gender_female")}</option>
@@ -302,24 +280,19 @@ export function PersonalReadingSection() {
                   </select>
                 </div>
 
-                {/* Relationship Status */}
+                {/* Birth Place */}
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="relationship" className="font-sans text-sm text-muted-foreground uppercase tracking-widest">
-                    {t("personal.relationship")}
+                  <label htmlFor="birthPlace" className="font-sans text-sm text-muted-foreground uppercase tracking-widest">
+                    Birth Place
                   </label>
-                  <select
-                    id="relationship"
-                    value={formData.relationship}
-                    onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                  >
-                    <option value="">{t("personal.rel_select")}</option>
-                    <option value="single">{t("personal.rel_single")}</option>
-                    <option value="in-relationship">{t("personal.rel_in_relationship")}</option>
-                    <option value="married">{t("personal.rel_married")}</option>
-                    <option value="complicated">{t("personal.rel_complicated")}</option>
-                    <option value="separated">{t("personal.rel_separated")}</option>
-                  </select>
+                  <input
+                    id="birthPlace"
+                    type="text"
+                    placeholder="Enter your birth place"
+                    value={formData.birthPlace}
+                    onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground font-serif placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                  />
                 </div>
 
                 {/* Occupation */}
@@ -366,31 +339,10 @@ export function PersonalReadingSection() {
                   </div>
                 </div>
 
-                {/* Zodiac Sign */}
-                <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="font-sans text-sm text-muted-foreground uppercase tracking-widest">
-                    {t("personal.zodiac")}
-                  </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                    {ZODIAC_SIGNS.map((sign) => (
-                      <button
-                        key={sign}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, zodiacSign: sign })}
-                        className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all ${formData.zodiacSign === sign
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                          }`}
-                      >
-                        <ZodiacIcon sign={sign} size={28} />
-                        <span className="text-xs font-sans">{sign}</span>
-                        <span className="text-[10px] text-muted-foreground">{ZODIAC_DATA[sign].dateRange}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              </div>
 
-                {/* Question */}
+              {/* Submit */}
+              <div className="mt-8 text-center">
                 <div className="flex flex-col gap-2 md:col-span-2">
                   <label htmlFor="question" className="font-sans text-sm text-muted-foreground uppercase tracking-widest">
                     {t("personal.question")}
@@ -408,14 +360,11 @@ export function PersonalReadingSection() {
                     {t("personal.question_tip")}
                   </p>
                 </div>
-              </div>
 
-              {/* Submit */}
-              <div className="mt-8 text-center">
                 <button
                   type="submit"
-                  disabled={!formData.name || !formData.zodiacSign || !formData.question || !formData.birthDate || !formData.age}
-                  className="px-10 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed animate-glow-pulse"
+                  disabled={!formData.name || !formData.question || !formData.birthDate}
+                  className="px-10 py-4 mt-8 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed animate-glow-pulse"
                 >
                   {t("personal.submit")}
                 </button>
