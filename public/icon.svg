@@ -1,26 +1,48 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    @media (prefers-color-scheme: light) {
-      .background { fill: black; }
-      .foreground { fill: white; }
-    }
-    @media (prefers-color-scheme: dark) {
-      .background { fill: white; }
-      .foreground { fill: black; }
-    }
-  </style>
-  <g clip-path="url(#clip0_7960_43945)">
-    <rect class="background" width="180" height="180" rx="37" />
-    <g style="transform: scale(95%); transform-origin: center">
-      <path class="foreground"
-        d="M101.141 53H136.632C151.023 53 162.689 64.6662 162.689 79.0573V112.904H148.112V79.0573C148.112 78.7105 148.098 78.3662 148.072 78.0251L112.581 112.898C112.701 112.902 112.821 112.904 112.941 112.904H148.112V126.672H112.941C98.5504 126.672 86.5638 114.891 86.5638 100.5V66.7434H101.141V100.5C101.141 101.15 101.191 101.792 101.289 102.422L137.56 66.7816C137.255 66.7563 136.945 66.7434 136.632 66.7434H101.141V53Z" />
-      <path class="foreground"
-        d="M65.2926 124.136L14 66.7372H34.6355L64.7495 100.436V66.7372H80.1365V118.47C80.1365 126.278 70.4953 129.958 65.2926 124.136Z" />
-    </g>
-  </g>
-  <defs>
-    <clipPath id="clip0_7960_43945">
-      <rect width="180" height="180" fill="white" />
-    </clipPath>
-  </defs>
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark mystic background for visibility -->
+  <circle cx="50" cy="50" r="50" fill="#0a0a12" />
+
+  <!-- Outer ring -->
+  <circle cx="50" cy="50" r="46" stroke="#c9a84c" stroke-width="1.5" opacity="0.8" />
+  <circle cx="50" cy="50" r="42" stroke="#c9a84c" stroke-width="0.5" opacity="0.5" />
+
+  <!-- Crystal ball / orb -->
+  <circle cx="50" cy="50" r="28" fill="#c9a84c" opacity="0.1" />
+  <circle cx="50" cy="50" r="28" stroke="#c9a84c" stroke-width="1.5" opacity="0.9" />
+
+  <!-- Inner glow -->
+  <circle cx="50" cy="48" r="18" fill="#c9a84c" opacity="0.2" />
+
+  <!-- Eye of providence / all-seeing eye -->
+  <ellipse cx="50" cy="50" rx="16" ry="10" stroke="#c9a84c" stroke-width="1.2" opacity="0.9" />
+  <circle cx="50" cy="50" r="5" fill="#c9a84c" opacity="0.8" />
+  <circle cx="50" cy="50" r="2.5" fill="#c9a84c" opacity="1" />
+
+  <!-- Light reflection -->
+  <circle cx="42" cy="40" r="3" fill="#c9a84c" opacity="0.4" />
+
+  <!-- Crescent moon - top left -->
+  <path d="M22 22 A10 10 0 0 1 28 14 A8 8 0 0 0 22 22Z" fill="#c9a84c" opacity="0.8" />
+
+  <!-- Star points around the orb -->
+  <circle cx="50" cy="12" r="2" fill="#c9a84c" opacity="0.9" />
+  <circle cx="50" cy="88" r="2" fill="#c9a84c" opacity="0.9" />
+  <circle cx="12" cy="50" r="2" fill="#c9a84c" opacity="0.9" />
+  <circle cx="88" cy="50" r="2" fill="#c9a84c" opacity="0.9" />
+
+  <!-- Diagonal star points -->
+  <circle cx="23" cy="23" r="1.5" fill="#c9a84c" opacity="0.7" />
+  <circle cx="77" cy="23" r="1.5" fill="#c9a84c" opacity="0.7" />
+  <circle cx="23" cy="77" r="1.5" fill="#c9a84c" opacity="0.7" />
+  <circle cx="77" cy="77" r="1.5" fill="#c9a84c" opacity="0.7" />
+
+  <!-- Connecting lines from stars to ring -->
+  <line x1="50" y1="12" x2="50" y2="22" stroke="#c9a84c" stroke-width="0.8" opacity="0.5" />
+  <line x1="50" y1="78" x2="50" y2="88" stroke="#c9a84c" stroke-width="0.8" opacity="0.5" />
+  <line x1="12" y1="50" x2="22" y2="50" stroke="#c9a84c" stroke-width="0.8" opacity="0.5" />
+  <line x1="78" y1="50" x2="88" y2="50" stroke="#c9a84c" stroke-width="0.8" opacity="0.5" />
+
+  <!-- Base / stand crescent -->
+  <path d="M36 78 Q50 86 64 78" stroke="#c9a84c" stroke-width="1.5" opacity="0.8" fill="none" />
+  <path d="M40 82 Q50 88 60 82" stroke="#c9a84c" stroke-width="1.2" opacity="0.6" fill="none" />
 </svg>
