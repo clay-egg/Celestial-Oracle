@@ -133,7 +133,11 @@ export function GeneralReadingSection() {
                 </div>
                 <div className="p-4 rounded-xl bg-secondary/50 border border-primary/10 text-center">
                   <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{t("general.best_day")}</p>
-                  <p className="font-sans text-primary text-lg">{reading.bestDay}</p>
+                  <p className="font-sans text-primary text-lg">{lang === "th" ? reading.bestDayTh : reading.bestDay}</p>
+                </div>
+                <div className="p-4 rounded-xl bg-secondary/50 border border-primary/10 text-center">
+                  <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{t("personal.lucky_color")}</p>
+                  <p className="font-sans text-primary text-lg">{lang === "th" ? reading.luckyColorTh : reading.luckyColor}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-secondary/50 border border-primary/10 text-center">
                   <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{t("general.cosmic_rating")}</p>

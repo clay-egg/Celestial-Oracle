@@ -443,34 +443,43 @@ Context for Reading:
 - Birth Place: ${input.birthPlace || "not specified"}
 - Question: "${input.question}"
 
-Generate a rich, personalized fortune reading. Most fields should be 2-3 sentences, but the "elementalReading" and "elementalReadingTh" fields MUST be exactly 4-5 short, impactful sentences to provide a direct answer to their question. Use mystical, warm, and clear language. Must be unique and specific to this person's question.
+Generate a rich, deeply personalized fortune reading. EVERY field (including greetings, lucky elements, and cosmic insights) MUST be contextually related to the user's specific question and situation. Do not use generic mystical text. Most fields should be 2-3 sentences, but the "elementalReading" and "elementalReadingTh" fields MUST be exactly 4-5 short, impactful sentences to provide a direct answer to their question. Use mystical, warm, and highly specific language.
+
+Translation Rules for Thai (TH) fields:
+- Use natural, familiar Thai language as used by local commoners.
+- ABSOLUTELY NO Japanese words or characters.
+- Do not force-translate English names or specific technical/modern terms that are commonly understood in English (keep them in English).
+- Ensure the tone remains mystical but accessible.
 
 Return this exact JSON structure:
 {
-  "greeting": "<warm mystical greeting mentioning their name and zodiac in English>",
+  "greeting": "<warm mystical greeting mentioning their name and zodiac in English, specifically tailored to their query>",
   "greetingTh": "<same in Thai>",
-  "cosmicAlignment": "<explain their 1-100 score and what their zodiac element means for their current path in English>",
+  "cosmicAlignment": "<explain their score and zodiac element specifically regarding their question in English>",
   "cosmicAlignmentTh": "<same in Thai>",
-  "lunarInfluence": "<explain how the current lunar phase affects them in English>",
+  "lunarInfluence": "<explain how the lunar phase affects their specific query in English>",
   "lunarInfluenceTh": "<same in Thai>",
-  "timeEnergy": "<explain how the time of day affects their reading in English>",
+  "timeEnergy": "<explain how the current time energy impacts their specific situation in English>",
   "timeEnergyTh": "<same in Thai>",
-  "seasonalWisdom": "<explain how the current season affects their query in English>",
+  "seasonalWisdom": "<explain how the current season shapes the outcome of their query in English>",
   "seasonalWisdomTh": "<same in Thai>",
-  "numerologyInsight": "<explain how their life path number and name string shape their destiny in English>",
+  "numerologyInsight": "<explain how their destiny numbers influence the specific answer to their question in English>",
   "numerologyInsightTh": "<same in Thai>",
-  "elementalReading": "<a direct and thoughtful 4-5 short sentence answer to their specific question in English. Provide clear insight and spiritual guidance.>",
-  "elementalReadingTh": "<same in Thai, 4-5 short sentences>",
-  "personalAdvice": "<actionable advice for their question in English>",
+  "elementalReading": "<the absolute direct answer to their question in English. Be decisive: state the likelihood of the outcome (Yes, No, or Likely) based on the cosmic score and signs. Do not just give advice; give a prediction. 4-5 short sentences.>",
+  "elementalReadingTh": "<same in Thai, be decisive about the prediction, 4-5 short sentences>",
+  "personalAdvice": "<actionable advice specifically for their question in English>",
   "personalAdviceTh": "<same in Thai>",
-  "overallEnergy": "<a short summary of their current life energy in English>",
+  "overallEnergy": "<a short summary of their current life energy relative to their query in English>",
   "overallEnergyTh": "<same in Thai>",
-  "warnings": "<one specific thing they should be careful about relative to their sign or question in English>",
+  "warnings": "<one specific thing they should be careful about relative to this specific situation in English>",
   "warningsTh": "<same in Thai>",
-  "closingMessage": "<warm mystical goodbye signoff in English>",
+  "closingMessage": "<warm mystical goodbye signoff in English, relating back to their query>",
   "closingMessageTh": "<same in Thai>",
-  "luckyDayTh": "<Thai translation of the day ${meta.luckyDay}>",
-  "luckyColorTh": "<Thai translation of the color ${meta.luckyColor}>"
+  "luckyNumbers": [number, number, number],
+  "luckyDay": "<lucky day of the week for this specific situation in English>",
+  "luckyDayTh": "<lucky day of the week for this specific situation in Thai>",
+  "luckyColor": "<lucky color for this specific situation in English>",
+  "luckyColorTh": "<lucky color for this specific situation in Thai>"
 }`;
 
   const res = await fetch("/api/fortune", {
@@ -507,8 +516,11 @@ Return this exact JSON structure:
     warningsTh: aiData.warningsTh,
     closingMessage: aiData.closingMessage,
     closingMessageTh: aiData.closingMessageTh,
-    luckyDayTh: aiData.luckyDayTh || meta.luckyDay,
-    luckyColorTh: aiData.luckyColorTh || meta.luckyColor,
+    luckyNumbers: aiData.luckyNumbers || meta.luckyNumbers,
+    luckyDay: aiData.luckyDay || meta.luckyDay,
+    luckyDayTh: aiData.luckyDayTh || aiData.luckyDay || meta.luckyDay,
+    luckyColor: aiData.luckyColor || meta.luckyColor,
+    luckyColorTh: aiData.luckyColorTh || aiData.luckyColor || meta.luckyColor,
     // Provide explicit fallbacks to text strings for backward compatibility in components
     answer: aiData.elementalReading,
     answerTh: aiData.elementalReadingTh,
@@ -538,6 +550,9 @@ export interface GeneralReading {
   rating: number;
   luckyNumbers: number[];
   bestDay: string;
+  bestDayTh: string;
+  luckyColor: string;
+  luckyColorTh: string;
   caution: string;
   cautionTh: string;
   affirmation: string;
@@ -551,6 +566,7 @@ export interface BaseGeneralReadingMetadata {
   rating: number;
   luckyNumbers: number[];
   bestDay: string;
+  luckyColor: string;
 }
 
 function calculateGeneralMetadata(zodiacSign: ZodiacSign, category: Category, period: Period): BaseGeneralReadingMetadata {
@@ -573,7 +589,7 @@ function calculateGeneralMetadata(zodiacSign: ZodiacSign, category: Category, pe
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const bestDay = period === "daily" ? "Today" : days[(seed + signIndex) % 7];
 
-  return { zodiacSign, category, period, rating, luckyNumbers: luckyNums, bestDay };
+  return { zodiacSign, category, period, rating, luckyNumbers: luckyNums, bestDay, luckyColor: zodiac.color };
 }
 
 // ─── AI-Powered General Reading ─────────────────────────────
@@ -599,7 +615,13 @@ Context:
 - Category: ${category} | Period: ${period}
 - Cosmic rating: ${meta.rating}/5
 
-Each field should be 2-3 short sentences, EXCEPT for "details" and "detailsTh" which MUST be 4-5 short sentences. Mystical, warm, and descriptive tone to the question.
+Each field MUST be closely related to the ${period} ${category} context for ${zodiacSign}. Most fields should be 2-3 short sentences, but the "details" and "detailsTh" fields MUST be exactly 4-5 short, impactful sentences. Mystical, warm, and highly contextual tone. Match all lucky elements to this specific cosmic period.
+
+Translation Rules for Thai (TH) fields:
+- Use natural, familiar Thai language as used by local commoners.
+- ABSOLUTELY NO Japanese words or characters.
+- Do not force-translate English names or specific technical/modern terms that are commonly understood in English (keep them in English).
+- Ensure the tone remains mystical but accessible.
 
 Return this exact JSON:
 {
@@ -612,7 +634,12 @@ Return this exact JSON:
   "caution": "<gentle caution during this period in English>",
   "cautionTh": "<same in Thai>",
   "affirmation": "<powerful affirmation in English>",
-  "affirmationTh": "<same in Thai>"
+  "affirmationTh": "<same in Thai>",
+  "luckyNumbers": [number, number, number],
+  "bestDay": "<best day in English>",
+  "bestDayTh": "<best day in Thai>",
+  "luckyColor": "<lucky color in English>",
+  "luckyColorTh": "<lucky color in Thai>"
 }`;
 
   const res = await fetch("/api/fortune", {
@@ -622,7 +649,7 @@ Return this exact JSON:
   });
 
   if (!res.ok) throw new Error("API error - Ensure the AI provider is configured correctly.");
-  const aiData = await res.json() as Record<string, string>;
+  const aiData = await res.json() as Record<string, any>;
 
   return {
     title: `${periodLabel} ${categoryLabel} Reading for ${zodiacSign}`,
@@ -637,5 +664,10 @@ Return this exact JSON:
     cautionTh: aiData.cautionTh,
     affirmation: aiData.affirmation,
     affirmationTh: aiData.affirmationTh,
+    luckyNumbers: aiData.luckyNumbers || meta.luckyNumbers,
+    bestDay: aiData.bestDay || meta.bestDay,
+    bestDayTh: aiData.bestDayTh || aiData.bestDay || meta.bestDay,
+    luckyColor: aiData.luckyColor || meta.luckyColor,
+    luckyColorTh: aiData.luckyColorTh || aiData.luckyColor || meta.luckyColor,
   };
 }
