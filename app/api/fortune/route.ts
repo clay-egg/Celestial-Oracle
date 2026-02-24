@@ -56,7 +56,8 @@ Context:
 Task: Generate a personalized fortune reading. 
 - Use the provided zodiac traits to make it specific.
 - "elementalReading" and "elementalReadingTh" must be exactly 4 short sentences providing a direct prediction.
-- All other fields should be 1-2 sentences.
+- "luckyDay", "luckyDayTh", "luckyColor", and "luckyColorTh" must be concise (e.g., "Tuesday", "Navy Blue").
+- All other text fields should be 1-2 sentences.
 - Be decisive based on the cosmic score.
 - Language: English and Thai. 
 
@@ -79,8 +80,8 @@ JSON Structure:
   "warnings": "...", "warningsTh": "...",
   "closingMessage": "...", "closingMessageTh": "...",
   "luckyNumbers": [number, number, number],
-  "luckyDay": "...", "luckyDayTh": "...",
-  "luckyColor": "...", "luckyColorTh": "..."
+  "luckyDay": "name of day", "luckyDayTh": "ชื่อวัน",
+  "luckyColor": "color name", "luckyColorTh": "ชื่อสี"
 }`;
 }
 
@@ -98,7 +99,8 @@ Context:
 
 Task: Generate a ${period} ${category} horoscope.
 - "details" and "detailsTh" must be exactly 4 short sentences.
-- All other fields 1-2 sentences.
+- "bestDay", "bestDayTh", "luckyColor", and "luckyColorTh" must be concise (e.g., "Wednesday", "Emerald Green").
+- All other text fields 1-2 sentences.
 - Language: English and Thai.
 
 CRITICAL LANGUAGE RULES:
@@ -113,8 +115,8 @@ JSON Structure:
   "caution": "...", "cautionTh": "...",
   "affirmation": "...", "affirmationTh": "...",
   "luckyNumbers": [number, number, number],
-  "bestDay": "...", "bestDayTh": "...",
-  "luckyColor": "...", "luckyColorTh": "..."
+  "bestDay": "name of day", "bestDayTh": "ชื่อวัน",
+  "luckyColor": "color name", "luckyColorTh": "ชื่อสี"
 }`;
 }
 
