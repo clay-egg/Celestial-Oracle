@@ -58,7 +58,12 @@ Task: Generate a personalized fortune reading.
 - "elementalReading" and "elementalReadingTh" must be exactly 4 short sentences providing a direct prediction.
 - All other fields should be 1-2 sentences.
 - Be decisive based on the cosmic score.
-- Language: English and Thai (natural commoner Thai, no Japanese).
+- Language: English and Thai. 
+
+CRITICAL LANGUAGE RULES:
+1. For all fields ending in "Th", use ONLY the Thai script (ก-ฮ, vowels, and Thai marks).
+2. STERN WARNING: ABSOLUTELY NO Chinese (Hanzi), Japanese (Kanji/Kana), or Korean (Hangul) characters are allowed. 
+3. Do NOT use characters from other scripts even if they seem relevant. If a Thai word is missing, use a descriptive Thai phrase.
 
 JSON Structure:
 {
@@ -94,8 +99,11 @@ Context:
 Task: Generate a ${period} ${category} horoscope.
 - "details" and "detailsTh" must be exactly 4 short sentences.
 - All other fields 1-2 sentences.
-- Use a mystical and contextual tone.
 - Language: English and Thai.
+
+CRITICAL LANGUAGE RULES:
+1. For all fields ending in "Th", use ONLY Thai script. 
+2. ABSOLUTELY NO Chinese, Japanese, or Korean characters.
 
 JSON Structure:
 {
@@ -174,6 +182,14 @@ export async function POST(req: NextRequest) {
         // Strip markdown fences just in case
         const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
         const parsed = JSON.parse(cleaned);
+
+        // Robust Sanitization: Strip non-Thai/English characters from Thai fields
+        const thaiRegex = /[^\u0E00-\u0E7F\x00-\x7F]/g;
+        for (const key in parsed) {
+            if (key.endsWith("Th") && typeof parsed[key] === "string") {
+                parsed[key] = parsed[key].replace(thaiRegex, "");
+            }
+        }
 
         return NextResponse.json(parsed);
     } catch (err) {
