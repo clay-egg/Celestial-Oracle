@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { ZODIAC_DATA, ZodiacSign } from "@/lib/fortune-engine";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -10,9 +11,103 @@ const MODELS = [
     "mixtral-8x7b-32768",
 ];
 
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 10; // 10 requests per minute
+
+function checkRateLimit(ip: string): boolean {
+    const now = Date.now();
+    const record = rateLimitMap.get(ip);
+
+    if (!record || now - record.lastReset > RATE_LIMIT_WINDOW) {
+        rateLimitMap.set(ip, { count: 1, lastReset: now });
+        return true;
+    }
+
+    if (record.count >= RATE_LIMIT_MAX) {
+        return false;
+    }
+
+    record.count++;
+    return true;
+}
+
 export interface FortuneAPIRequest {
     type: "personal" | "general";
-    prompt: string;
+    data: any;
+}
+
+function generatePersonalPrompt(data: any) {
+    const { name, meta, question, occupation, birthPlace } = data;
+    const zodiac = ZODIAC_DATA[meta.zodiacSign as ZodiacSign];
+
+    return `You are a mystical celestial oracle. Respond ONLY with a valid JSON object.
+
+Context:
+- User: ${name} (Age ${meta.age})
+- Zodiac: ${meta.zodiacSign} (${zodiac.element} element, ${zodiac.quality} quality, ruled by ${zodiac.ruler})
+- Traits: ${zodiac.traits.join(", ")}
+- Strengths: ${zodiac.strengths.join(", ")}
+- Challenges: ${zodiac.challenges.join(", ")}
+- Cosmic Score: ${meta.cosmicScore}/100 (Verdict: ${meta.verdictLevel})
+- Question: "${question}"
+
+Task: Generate a personalized fortune reading. 
+- Use the provided zodiac traits to make it specific.
+- "elementalReading" and "elementalReadingTh" must be exactly 4 short sentences providing a direct prediction.
+- All other fields should be 1-2 sentences.
+- Be decisive based on the cosmic score.
+- Language: English and Thai (natural commoner Thai, no Japanese).
+
+JSON Structure:
+{
+  "greeting": "...", "greetingTh": "...",
+  "cosmicAlignment": "...", "cosmicAlignmentTh": "...",
+  "lunarInfluence": "...", "lunarInfluenceTh": "...",
+  "timeEnergy": "...", "timeEnergyTh": "...",
+  "seasonalWisdom": "...", "seasonalWisdomTh": "...",
+  "numerologyInsight": "...", "numerologyInsightTh": "...",
+  "elementalReading": "...", "elementalReadingTh": "...",
+  "personalAdvice": "...", "personalAdviceTh": "...",
+  "overallEnergy": "...", "overallEnergyTh": "...",
+  "warnings": "...", "warningsTh": "...",
+  "closingMessage": "...", "closingMessageTh": "...",
+  "luckyNumbers": [number, number, number],
+  "luckyDay": "...", "luckyDayTh": "...",
+  "luckyColor": "...", "luckyColorTh": "..."
+}`;
+}
+
+function generateGeneralPrompt(data: any) {
+    const { zodiacSign, category, period, meta } = data;
+    const zodiac = ZODIAC_DATA[zodiacSign as ZodiacSign];
+
+    return `You are a mystical celestial oracle. Respond ONLY with a valid JSON object.
+
+Context:
+- Sign: ${zodiacSign} (${zodiac.element} element, ruled by ${zodiac.ruler})
+- Traits: ${zodiac.traits.join(", ")}
+- Category: ${category} | Period: ${period}
+- Cosmic rating: ${meta.rating}/5
+
+Task: Generate a ${period} ${category} horoscope.
+- "details" and "detailsTh" must be exactly 4 short sentences.
+- All other fields 1-2 sentences.
+- Use a mystical and contextual tone.
+- Language: English and Thai.
+
+JSON Structure:
+{
+  "overview": "...", "overviewTh": "...",
+  "details": "...", "detailsTh": "...",
+  "advice": "...", "adviceTh": "...",
+  "caution": "...", "cautionTh": "...",
+  "affirmation": "...", "affirmationTh": "...",
+  "luckyNumbers": [number, number, number],
+  "bestDay": "...", "bestDayTh": "...",
+  "luckyColor": "...", "luckyColorTh": "..."
+}`;
 }
 
 async function callGroq(prompt: string): Promise<string> {
@@ -45,6 +140,11 @@ async function callGroq(prompt: string): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
+    const ip = req.headers.get("x-forwarded-for") || "anonymous";
+    if (!checkRateLimit(ip)) {
+        return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
     if (!process.env.GROQ_API_KEY) {
         console.error("[Fortune API] GROQ_API_KEY is not set in .env.local");
         return NextResponse.json({ error: "GROQ_API_KEY not configured" }, { status: 500 });
@@ -53,7 +153,23 @@ export async function POST(req: NextRequest) {
     let rawText = "";
     try {
         const body: FortuneAPIRequest = await req.json();
-        rawText = await callGroq(body.prompt);
+
+        // Input Validation
+        if (body.type === "personal") {
+            const { name, question } = body.data;
+            if (!name || name.length > 50) {
+                return NextResponse.json({ error: "Invalid name. Maximum 50 characters allowed." }, { status: 400 });
+            }
+            if (!question || question.length > 300) {
+                return NextResponse.json({ error: "Invalid question. Maximum 300 characters allowed." }, { status: 400 });
+            }
+        }
+
+        const prompt = body.type === "personal"
+            ? generatePersonalPrompt(body.data)
+            : generateGeneralPrompt(body.data);
+
+        rawText = await callGroq(prompt);
 
         // Strip markdown fences just in case
         const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
