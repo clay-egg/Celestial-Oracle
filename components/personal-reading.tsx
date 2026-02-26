@@ -257,7 +257,7 @@ export function PersonalReadingSection() {
                     required
                     value={formData.birthDate}
                     onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-lg bg-secondary border border-border font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none min-h-[50px] ${!formData.birthDate ? "text-muted-foreground" : "text-foreground"}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-secondary border border-border font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none min-h-[50px] appearance-none ${!formData.birthDate ? "text-muted-foreground" : "text-foreground"}`}
                   />
                 </div>
 
@@ -271,12 +271,6 @@ export function PersonalReadingSection() {
                     value={formData.gender}
                     onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                     className={`w-full px-4 py-3 rounded-lg bg-secondary border border-border font-serif focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none appearance-none min-h-[50px] ${!formData.gender ? "text-muted-foreground" : "text-foreground"}`}
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c9a84c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E")`,
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'right 1rem center',
-                      backgroundSize: '1.2em'
-                    }}
                   >
                     <option value="">{t("personal.gender_select")}</option>
                     <option value="female">{t("personal.gender_female")}</option>
