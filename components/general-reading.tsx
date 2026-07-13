@@ -73,7 +73,7 @@ export function GeneralReadingSection() {
             </h2>
             <Star className="w-6 h-6 text-primary" />
           </div>
-          <p className="font-serif text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="font-serif text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t("general.subtitle")}
           </p>
         </div>
@@ -104,7 +104,7 @@ export function GeneralReadingSection() {
               {/* Overview */}
               <div className="mb-6 p-6 rounded-xl bg-secondary/50 border border-primary/10">
                 <h4 className="font-sans text-sm text-primary uppercase tracking-widest mb-3">{t("general.overview")}</h4>
-                <p className="font-serif text-lg text-foreground leading-relaxed">{lang === "th" ? reading.overviewTh : reading.overview}</p>
+                <p className="font-serif text-xl text-foreground leading-relaxed">{lang === "th" ? reading.overviewTh : reading.overview}</p>
               </div>
 
               {/* Details */}
@@ -235,7 +235,7 @@ export function GeneralReadingSection() {
                     >
                       <ZodiacIcon sign={sign} size={32} />
                       <span className="text-xs font-sans">{sign}</span>
-                      <span className="text-[10px] text-muted-foreground">{ZODIAC_DATA[sign].dateRange}</span>
+                      <span className="text-[11px] text-muted-foreground/90">{ZODIAC_DATA[sign].dateRange}</span>
                     </button>
                   ))}
                 </div>
@@ -269,8 +269,8 @@ export function GeneralReadingSection() {
                         }`}>
                         {cat.icon}
                       </div>
-                      <span className="font-sans text-lg">{cat.label}</span>
-                      <span className="text-xs text-muted-foreground font-serif text-center">{cat.description}</span>
+                      <span className="font-sans text-xl">{cat.label}</span>
+                      <span className="text-sm text-muted-foreground font-serif text-center">{cat.description}</span>
                     </button>
                   ))}
                 </div>
@@ -305,8 +305,8 @@ export function GeneralReadingSection() {
                         : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                         }`}
                     >
-                      <span className="font-sans text-lg">{per.label}</span>
-                      <span className="text-xs text-muted-foreground font-serif">{per.description}</span>
+                      <span className="font-sans text-xl">{per.label}</span>
+                      <span className="text-sm text-muted-foreground font-serif">{per.description}</span>
                     </button>
                   ))}
                 </div>

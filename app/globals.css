@@ -5,31 +5,31 @@
 
 :root {
   --background: #0a0a12;
-  --foreground: #e8e0d4;
-  --card: #12121e;
-  --card-foreground: #e8e0d4;
-  --popover: #12121e;
-  --popover-foreground: #e8e0d4;
-  --primary: #c9a84c;
+  --foreground: #f0ecf8;
+  --card: #14141f;
+  --card-foreground: #f0ecf8;
+  --popover: #14141f;
+  --popover-foreground: #f0ecf8;
+  --primary: #d4aa50;
   --primary-foreground: #0a0a12;
-  --secondary: #1a1a2e;
-  --secondary-foreground: #e8e0d4;
-  --muted: #1a1a2e;
-  --muted-foreground: #8a8098;
-  --accent: #c9a84c;
+  --secondary: #1e1e30;
+  --secondary-foreground: #f0ecf8;
+  --muted: #1e1e30;
+  --muted-foreground: #b8b4c8;
+  --accent: #d4aa50;
   --accent-foreground: #0a0a12;
-  --destructive: #c44040;
-  --destructive-foreground: #e8e0d4;
-  --border: #2a2a3e;
-  --input: #1a1a2e;
-  --ring: #c9a84c;
-  --chart-1: #c9a84c;
-  --chart-2: #6a4c93;
-  --chart-3: #3a86c4;
-  --chart-4: #c44040;
-  --chart-5: #4caf50;
+  --destructive: #e05050;
+  --destructive-foreground: #f0ecf8;
+  --border: #32324a;
+  --input: #1e1e30;
+  --ring: #d4aa50;
+  --chart-1: #d4aa50;
+  --chart-2: #7a5ca8;
+  --chart-3: #4a96d4;
+  --chart-4: #e05050;
+  --chart-5: #5cbf60;
   --radius: 0.75rem;
-  --mystic-glow: #c9a84c33;
+  --mystic-glow: #d4aa5040;
   --mystic-deep: #06060e;
 }
 
@@ -76,6 +76,22 @@
 
   body {
     @apply bg-background text-foreground;
+    font-size: 16.5px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Make serif (Cormorant Garamond) body text heavier by default */
+  .font-serif {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /* Keep muted labels legible at smaller sizes */
+  .text-xs, .text-\[11px\] {
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -177,10 +193,11 @@
 }
 
 .gold-text {
-  background: linear-gradient(135deg, #c9a84c, #e8d48b, #c9a84c);
+  background: linear-gradient(135deg, #d4aa50, #f5e199, #ffefc2, #f5e199, #d4aa50);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(212, 170, 80, 0.5));
 }
 
 .star {

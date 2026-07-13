@@ -22,7 +22,7 @@ export function Footer() {
               <h3 className="font-sans text-sm text-primary uppercase tracking-widest">
                 {t("footer.celestial_title")}
               </h3>
-              <p className="font-serif text-sm text-muted-foreground leading-relaxed text-center">
+              <p className="font-serif text-base text-muted-foreground leading-relaxed text-center">
                 {t("footer.celestial_desc")}
               </p>
             </div>
@@ -33,7 +33,7 @@ export function Footer() {
               <h3 className="font-sans text-sm text-primary uppercase tracking-widest">
                 {t("footer.temporal_title")}
               </h3>
-              <p className="font-serif text-sm text-muted-foreground leading-relaxed text-center">
+              <p className="font-serif text-base text-muted-foreground leading-relaxed text-center">
                 {t("footer.temporal_desc")}
               </p>
             </div>
@@ -44,7 +44,7 @@ export function Footer() {
               <h3 className="font-sans text-sm text-primary uppercase tracking-widest">
                 {t("footer.numerology_title")}
               </h3>
-              <p className="font-serif text-sm text-muted-foreground leading-relaxed text-center">
+              <p className="font-serif text-base text-muted-foreground leading-relaxed text-center">
                 {t("footer.numerology_desc")}
               </p>
             </div>

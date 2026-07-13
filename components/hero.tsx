@@ -49,10 +49,10 @@ export function Hero() {
           {t("hero.title")}
         </h1>
 
-        <p className="font-serif text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed mb-2">
+        <p className="font-serif text-xl md:text-2xl text-muted-foreground max-w-xl leading-relaxed mb-2">
           {t("hero.subtitle")}
         </p>
-        <p className="font-serif text-sm md:text-base text-muted-foreground/70 max-w-lg leading-relaxed mb-10">
+        <p className="font-serif text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed mb-10">
           {t("hero.desc")}
         </p>
 
