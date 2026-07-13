@@ -17,6 +17,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.personal": "Personal Reading",
     "nav.general": "General Horoscope",
     "nav.home": "Home",
+    "nav.tarot": "Tarot Reading",
 
     // Hero
     "hero.title": "Celestial Oracle",
@@ -24,6 +25,7 @@ const translations: Record<Language, Record<string, string>> = {
     "hero.desc": "Ancient wisdom meets celestial calculation. Your zodiac sign, numerology, lunar phase, and cosmic timing converge to reveal what the universe holds for you.",
     "hero.personal_btn": "Personal Reading",
     "hero.general_btn": "General Horoscope",
+    "hero.tarot_btn": "Tarot Reading",
 
     // Personal Reading
     "personal.title": "Personal Oracle Reading",
@@ -126,6 +128,32 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.numerology_desc": "Your name number and life path number are derived using Pythagorean numerology, adding a deeply personal layer to your reading.",
     "footer.disclaimer": "Celestial Oracle - For entertainment and personal reflection purposes.",
     "footer.tagline": "The stars illuminate the path, but you must walk it.",
+
+    // Tarot
+    "tarot.title": "Three-Card Tarot Reading",
+    "tarot.subtitle": "Draw three cards from the Rider–Waite–Smith deck and receive a Past, Present, and Future reading guided by ancient tarot wisdom.",
+    "tarot.begin_title": "Begin Your Tarot Session",
+    "tarot.begin_desc": "Focus your mind, take a breath, and ask your question. When you feel ready, the cards will be shuffled and spread before you.",
+    "tarot.question_label": "Your Question (Optional)",
+    "tarot.question_placeholder": "What weighs on your heart? Or leave blank for a general reading...",
+    "tarot.optional": "Optional",
+    "tarot.begin_btn": "Shuffle the Deck",
+    "tarot.shuffling": "The cards are being shuffled by cosmic forces...",
+    "tarot.pick_prompt": "Choose your cards:",
+    "tarot.pick_sub": "Hover to sense the energy. Click to choose. Select 3 cards.",
+    "tarot.arranging": "The fates are arranging your cards...",
+    "tarot.revealing": "Your destiny is being revealed...",
+    "tarot.interpreting": "The Oracle is reading the cosmic alignment...",
+    "tarot.try_again": "Try Again",
+    "tarot.past": "Past",
+    "tarot.present": "Present",
+    "tarot.future": "Future",
+    "tarot.the_reading": "Your Tarot Reading",
+    "tarot.your_question": "Your Question",
+    "tarot.oracle_advice": "Oracle Advice",
+    "tarot.affirmation": "Your Affirmation",
+    "tarot.card_meanings": "Card Meanings",
+    "tarot.new_reading": "New Reading",
   },
   th: {
     // Nav
@@ -133,6 +161,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.personal": "ดูดวงส่วนตัว",
     "nav.general": "ดูดวงทั่วไป",
     "nav.home": "หน้าแรก",
+    "nav.tarot": "ไพ่ทาโรต์",
 
     // Hero
     "hero.title": "Celestial Oracle",
@@ -140,6 +169,7 @@ const translations: Record<Language, Record<string, string>> = {
     "hero.desc": "ภูมิปัญญาโบราณผสานกับการคำนวณจักรราศี ราศีของคุณ ตัวเลขศาสตร์ ข้างขึ้นข้างแรม และจังหวะจักรวาลรวมกันเพื่อเปิดเผยสิ่งที่จักรวาลมีไว้ให้คุณ",
     "hero.personal_btn": "ดูดวงส่วนตัว",
     "hero.general_btn": "ดูดวงทั่วไป",
+    "hero.tarot_btn": "ไพ่ทาโรต์",
 
     // Personal Reading
     "personal.title": "ดูดวงส่วนตัว",
@@ -242,6 +272,32 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.numerology_desc": "เลขชื่อและเลขเส้นทางชีวิตของคุณถูกคำนวณด้วยตัวเลขศาสตร์พีทาโกรัส เพิ่มชั้นที่เป็นเอกลักษณ์ส่วนตัวให้กับการดูดวงของคุณ",
     "footer.disclaimer": "Celestial Oracle - เพื่อความบันเทิงและการใคร่ครวญส่วนตัว",
     "footer.tagline": "ดวงดาวส่องทาง แต่คุณต้องเดินเอง",
+
+    // Tarot
+    "tarot.title": "ไพ่ทาโรต์สามใบ",
+    "tarot.subtitle": "จั่วไพ่สามใบจากสำรับไรเดอร์-เวทและรับการทำนายอดีต ปัจจุบัน และอนาคต",
+    "tarot.begin_title": "เริ่มต้นการอ่านไพ่ทาโรต์",
+    "tarot.begin_desc": "ตั้งสมาธิ หายใจลึกๆ และถามคำถามในใจ เมื่อพร้อมแล้วไพ่จะถูกสับและวางให้คุณเลือก",
+    "tarot.question_label": "คำถามของคุณ (ไม่บังคับ)",
+    "tarot.question_placeholder": "มีอะไรหนักใจไหม? หรือปล่อยว่างเพื่อการทำนายทั่วไป...",
+    "tarot.optional": "ไม่บังคับ",
+    "tarot.begin_btn": "สับไพ่",
+    "tarot.shuffling": "ไพ่กำลังถูกสับด้วยพลังจักรวาล...",
+    "tarot.pick_prompt": "เลือกไพ่ของคุณ:",
+    "tarot.pick_sub": "วางเมาส์เพื่อรับรู้พลังงาน คลิกเพื่อเลือก เลือก 3 ใบ",
+    "tarot.arranging": "โชคชะตากำลังจัดเรียงไพ่ของคุณ...",
+    "tarot.revealing": "ชะตากรรมของคุณกำลังถูกเปิดเผย...",
+    "tarot.interpreting": "ออราเคิลกำลังอ่านการเรียงตัวจักรวาล...",
+    "tarot.try_again": "ลองใหม่",
+    "tarot.past": "อดีต",
+    "tarot.present": "ปัจจุบัน",
+    "tarot.future": "อนาคต",
+    "tarot.the_reading": "การทำนายไพ่ทาโรต์ของคุณ",
+    "tarot.your_question": "คำถามของคุณ",
+    "tarot.oracle_advice": "คำแนะนำจากออราเคิล",
+    "tarot.affirmation": "คำยืนยันของคุณ",
+    "tarot.card_meanings": "ความหมายของไพ่",
+    "tarot.new_reading": "อ่านไพ่ใหม่",
   },
 };
 

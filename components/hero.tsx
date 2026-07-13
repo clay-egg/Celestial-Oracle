@@ -70,6 +70,12 @@ export function Hero() {
           >
             {t("hero.general_btn")}
           </Link>
+          <Link
+            href="/tarot"
+            className="px-8 py-4 rounded-full border border-primary/60 text-muted-foreground font-sans text-sm uppercase tracking-widest hover:border-primary hover:text-primary transition-all text-center"
+          >
+            {t("hero.tarot_btn")}
+          </Link>
         </div>
       </div>
     </section>

@@ -30,6 +30,7 @@ export function Nav() {
     { href: "/", label: t("nav.home") },
     { href: "/personal", label: t("nav.personal") },
     { href: "/general", label: t("nav.general") },
+    { href: "/tarot", label: t("nav.tarot") },
   ];
 
   return (
