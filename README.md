@@ -6,14 +6,34 @@ Celestial Oracle is a next-generation spiritual engine that combines ancient ast
 
 ---
 
-## ✨ Features
+## ✨ Features in Detail
 
-- **🎯 Personal Readings**: Ask specific questions about love, career, or destiny and receive decisive, AI-calculated answers.
-- **💀 Brutal Honesty**: No sugarcoating. The Oracle delivers realistic, sometimes stern, but always authentic insights based on cosmic alignment.
-- **⚖️ Dynamic Cosmic Scoring**: A real-time 0-100 score calculated by AI factors in your birth data, name numerology, and current lunar phases.
-- **📅 General Horoscopes**: Detailed Love, Wealth, and Health forecasts for all Zodiac signs across Daily, Weekly, and Monthly periods.
-- **🇹🇭 Bilingual Support**: Native, natural Thai and English responses generated concurrently.
-- **🌌 Interactive UI**: A premium, mystical aesthetic with glassmorphism, animated galactic fields, and responsive charts.
+### 1. 🔮 Three-Card Tarot Reading
+Experience an immersive, authentic tarot session using the classic 78-card Rider-Waite-Smith (1909) deck.
+- **Interactive Deck**: Watch the cards shuffle in real-time and spread into a beautiful, interactive fan.
+- **User Selection**: Hover and sense the energy of the cards, then hand-pick your 3 cards for the reading.
+- **Dynamic Reveal**: Cards are arranged into a Past, Present, and Future spread and revealed with smooth 3D flip animations.
+- **The Oracle's Wisdom**: The Oracle synthesizes the traditional visual symbolism of the drawn cards alongside your personal question to deliver a unified, personalized narrative.
+
+### 2. 🎯 Personal Readings
+Ask specific questions about your life, love, career, or destiny and receive decisive, uncompromising answers.
+- **Deep Personalization**: Inputs include your name, age, zodiac, relationship status, occupation, and a specific question.
+- **Cosmic Synthesis**: The Oracle calculates your path using Pythagorean numerology, current lunar phases, seasonal wisdom, and cosmic alignment.
+- **Actionable Insights**: You receive a realistic analysis, a 0-100 Cosmic Favorability score, and personalized lucky elements (numbers, days, colors).
+
+### 3. 📅 General Horoscopes
+Detailed forecasts tailored to your Zodiac sign across different life sectors.
+- **Targeted Sectors**: Choose between Love (relationships/emotions), Wealth (career/finances), or Health (vitality/well-being).
+- **Flexible Timeframes**: Cast the planetary movements over Daily, Weekly, Monthly, or Yearly periods.
+- **Radar Analysis**: Visualizes your astrological potential via a dynamic radar chart mapping axes like Opportunity, Challenge, Emotional Depth, and Physical Vitality.
+
+### 4. 🇹🇭 Bilingual Support
+- **Native Dual Language**: Fully localized interface and AI-generated responses in both English and Thai.
+
+### 5. 🌌 Premium Mystical UI/UX
+- **Visuals**: A deep, space-themed aesthetic featuring glowing gradients, glassmorphism, and animated starfields.
+- **Animations**: Powered by Framer Motion for buttery-smooth transitions, staggered reveals, and realistic card interactions.
+- **Responsive**: Flawless experience across desktop, tablet, and mobile devices.
 
 ---
 
@@ -22,6 +42,7 @@ Celestial Oracle is a next-generation spiritual engine that combines ancient ast
 - **Framework**: [Next.js](https://nextjs.org/) (App Router)
 - **AI Engine**: [Groq SDK](https://groq.com/) & [Google Generative AI](https://aistudio.google.com/)
 - **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Components**: [Radix UI](https://www.radix-ui.com/) & [Lucide React](https://lucide.dev/)
 - **Charts**: [Recharts](https://recharts.org/)
 - **State & Context**: React Context (Language/Theme)
@@ -60,16 +81,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to start y
 
 ```text
 ├── app/                  # Next.js App Router (Pages & API)
-│   ├── api/fortune/      # AI Fortune generation endpoint
+│   ├── api/              # AI endpoints (fortune, tarot)
 │   ├── general/          # General Horoscope pages
-│   └── personal/         # Personal Reading pages
+│   ├── personal/         # Personal Reading pages
+│   └── tarot/            # Three-Card Tarot Reading page
 ├── components/           # React Components (UI & Logic)
+│   ├── tarot/            # Complex Tarot session components & state machine
 │   ├── ui/               # Primary UI components (Radix/Shadcn)
-│   └── ...               # Custom mystical components
+│   └── ...               # Custom mystical components (Header, Footer, Starfield)
 ├── lib/                  # Core Utilities & AI Logic
-│   ├── fortune-engine.ts # The heart of the Oracle (Calculations & Prompts)
+│   ├── fortune-engine.ts # LLM Prompts and JSON schema validation for horoscopes
+│   ├── tarot-data.ts     # Metadata for all 78 Rider-Waite-Smith tarot cards
+│   ├── language-context.tsx # Global i18n translation context
 │   └── utils.ts          # Tailwind merge & helpers
-└── public/               # Static assets & icons
+└── public/               # Static assets
+    └── tarot/cards/      # High-res, public domain RWS Tarot card images
 ```
 
 ---
