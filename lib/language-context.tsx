@@ -129,6 +129,31 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.disclaimer": "Celestial Oracle - For entertainment and personal reflection purposes.",
     "footer.tagline": "The stars illuminate the path, but you must walk it.",
 
+    // Footer - Personal
+    "footer.personal_title1": "Astrological Profile",
+    "footer.personal_desc1": "Your birth date and chosen zodiac sign map your unique energetic signature and current life path.",
+    "footer.personal_title2": "Cosmic Timing",
+    "footer.personal_desc2": "We calculate the exact phase of the moon and the planetary transits to understand the energies surrounding your question.",
+    "footer.personal_title3": "Numerological Resonance",
+    "footer.personal_desc3": "The vibration of your name and age are synthesized using Pythagorean numerology to deepen the reading.",
+
+    // Footer - General
+    "footer.general_title1": "Zodiac Blueprint",
+    "footer.general_desc1": "The core traits, ruling planet, and elemental nature of your selected sign form the foundation of the forecast.",
+    "footer.general_title2": "Life Sector Alignment",
+    "footer.general_desc2": "The chosen category directs the cosmic lens towards the specific astrological houses governing love, wealth, or health.",
+    "footer.general_title3": "Temporal Projection",
+    "footer.general_desc3": "Planetary movements are cast forward over your chosen timeframe to reveal incoming trends and opportunities.",
+
+    // Footer - Tarot
+    "footer.tarot_title1": "The Fool's Journey",
+    "footer.tarot_desc1": "The Rider-Waite-Smith deck contains 78 archetypes that mirror the human experience and the soul's evolution.",
+    "footer.tarot_title2": "The Spread",
+    "footer.tarot_desc2": "A classic three-card spread connects the energies of your Past, the reality of your Present, and the potential of your Future.",
+    "footer.tarot_title3": "The Oracle's Wisdom",
+    "footer.tarot_desc3": "The Oracle channels the traditional meanings and visual symbolism of your drawn cards into a unified, personal narrative.",
+
+
     // Tarot
     "tarot.title": "Three-Card Tarot Reading",
     "tarot.subtitle": "Draw three cards from the Rider–Waite–Smith deck and receive a Past, Present, and Future reading guided by ancient tarot wisdom.",
@@ -272,6 +297,31 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.numerology_desc": "เลขชื่อและเลขเส้นทางชีวิตของคุณถูกคำนวณด้วยตัวเลขศาสตร์พีทาโกรัส เพิ่มชั้นที่เป็นเอกลักษณ์ส่วนตัวให้กับการดูดวงของคุณ",
     "footer.disclaimer": "Celestial Oracle - เพื่อความบันเทิงและการใคร่ครวญส่วนตัว",
     "footer.tagline": "ดวงดาวส่องทาง แต่คุณต้องเดินเอง",
+
+    // Footer - Personal
+    "footer.personal_title1": "ข้อมูลทางโหราศาสตร์",
+    "footer.personal_desc1": "วันเกิดและราศีที่คุณเลือกจะกำหนดแผนผังพลังงานและเส้นทางชีวิตที่เป็นเอกลักษณ์ของคุณ",
+    "footer.personal_title2": "จังหวะแห่งจักรวาล",
+    "footer.personal_desc2": "เราคำนวณข้างขึ้นข้างแรมและการโคจรของดาวเคราะห์เพื่อทำความเข้าใจพลังงานที่อยู่รอบๆ คำถามของคุณ",
+    "footer.personal_title3": "เสียงสะท้อนแห่งตัวเลขศาสตร์",
+    "footer.personal_desc3": "แรงสั่นสะเทือนของชื่อและอายุของคุณจะถูกสังเคราะห์ด้วยตัวเลขศาสตร์พีทาโกรัสเพื่อเจาะลึกคำทำนาย",
+
+    // Footer - General
+    "footer.general_title1": "พิมพ์เขียวจักรราศี",
+    "footer.general_desc1": "ลักษณะนิสัยพื้นฐาน ดาวเคราะห์ปกครอง และธาตุประจำราศีที่คุณเลือกคือรากฐานของคำพยากรณ์",
+    "footer.general_title2": "การจัดตำแหน่งช่วงชีวิต",
+    "footer.general_desc2": "หมวดหมู่ที่คุณเลือกจะชี้เลนส์แห่งจักรวาลไปยังเรือนชะตาที่ควบคุมเรื่องความรัก ความมั่งคั่ง หรือสุขภาพ",
+    "footer.general_title3": "การคาดการณ์ช่วงเวลา",
+    "footer.general_desc3": "การเคลื่อนที่ของดาวเคราะห์จะถูกฉายภาพไปข้างหน้าตามกรอบเวลาที่คุณเลือกเพื่อเผยให้เห็นแนวโน้มและโอกาส",
+
+    // Footer - Tarot
+    "footer.tarot_title1": "การเดินทางของ The Fool",
+    "footer.tarot_desc1": "สำรับไพ่ Rider-Waite-Smith ประกอบด้วยต้นแบบ 78 แบบที่สะท้อนถึงประสบการณ์ของมนุษย์และวิวัฒนาการของจิตวิญญาณ",
+    "footer.tarot_title2": "รูปแบบการวางไพ่",
+    "footer.tarot_desc2": "การเรียงไพ่ 3 ใบแบบคลาสสิกจะเชื่อมโยงพลังงานในอดีต ความเป็นจริงในปัจจุบัน และศักยภาพในอนาคตของคุณ",
+    "footer.tarot_title3": "การผสานพลังแห่งออราเคิล",
+    "footer.tarot_desc3": "ออราเคิลจะผสานความหมายดั้งเดิมและสัญลักษณ์ของไพ่ที่คุณจั่วออกมาเป็นการเล่าเรื่องที่เชื่อมโยงถึงดวงชะตาของคุณโดยเฉพาะ",
+
 
     // Tarot
     "tarot.title": "ไพ่ทาโรต์สามใบ",
