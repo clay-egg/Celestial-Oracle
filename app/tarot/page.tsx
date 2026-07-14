@@ -13,5 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default function TarotPage() {
-  return <TarotSession />;
+  return (
+    <div className="pt-20">
+      <TarotSession />
+    </div>
+  );
 }

@@ -17,7 +17,7 @@ export function Hero() {
     <section className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
       {/* Orbiting zodiac ring */}
       <div
-        className="absolute w-[280px] h-[280px] md:w-[400px] md:h-[400px] rounded-full border border-primary/10"
+        className="absolute w-[280px] h-[280px] md:w-[400px] md:h-[400px] rounded-full border border-primary/10 hidden sm:block"
         aria-hidden="true"
       >
         {ORBITING_SIGNS.map((sign, i) => {
@@ -29,7 +29,10 @@ export function Hero() {
               style={{
                 top: "50%",
                 left: "50%",
-                transform: `rotate(${angle}deg) translateX(min(140px, 22vw)) rotate(-${angle}deg) translate(-50%, -50%)`,
+                // On mobile (sm), ring is 280px (radius 140px). On md it's 400px (radius 200px).
+                // We use css clamp or just a safe fixed translate based on a CSS custom property if we could, 
+                // but since it's inline, we'll use a CSS clamp that approximates it: clamp(140px, 30vw, 200px)
+                transform: `rotate(${angle}deg) translateX(clamp(140px, 35vw, 200px)) rotate(-${angle}deg) translate(-50%, -50%)`,
                 animationDelay: `${i * 0.3}s`,
               }}
             >
@@ -45,19 +48,19 @@ export function Hero() {
           <OracleLogo size={72} className="text-primary animate-float" />
         </div>
 
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-sans gold-text tracking-wider mb-4 leading-tight text-balance">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-sans gold-text tracking-wider mb-4 leading-tight text-balance px-2">
           {t("hero.title")}
         </h1>
 
-        <p className="font-serif text-xl md:text-2xl text-muted-foreground max-w-xl leading-relaxed mb-2">
+        <p className="font-serif text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-xl leading-relaxed mb-2 px-4">
           {t("hero.subtitle")}
         </p>
-        <p className="font-serif text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed mb-10">
+        <p className="font-serif text-base sm:text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed mb-10 px-4">
           {t("hero.desc")}
         </p>
 
         {/* CTA Buttons - Link to separate pages */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6">
           <Link
             href="/personal"
             className="px-8 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all text-center"
