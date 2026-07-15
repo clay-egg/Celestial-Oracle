@@ -1,0 +1,10 @@
+{
+  "security": {
+    "rateLimit": {
+      "api": {
+        "window": "1m",
+        "limit": 7
+      }
+    }
+  }
+}
