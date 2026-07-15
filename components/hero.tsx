@@ -62,22 +62,22 @@ export function Hero() {
         {/* CTA Buttons - Link to separate pages */}
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6">
           <Link
+            href="/tarot"
+            className="px-8 py-4 rounded-full border border-primary text-primary font-sans text-sm uppercase tracking-widest hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] transition-all duration-300 text-center"
+          >
+            {t("hero.tarot_btn")}
+          </Link>
+          <Link
             href="/personal"
-            className="px-8 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all text-center"
+            className="px-8 py-4 rounded-full border border-primary text-primary font-sans text-sm uppercase tracking-widest hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] transition-all duration-300 text-center"
           >
             {t("hero.personal_btn")}
           </Link>
           <Link
             href="/general"
-            className="px-8 py-4 rounded-full border border-primary text-primary font-sans text-sm uppercase tracking-widest hover:bg-primary/10 transition-all text-center"
+            className="px-8 py-4 rounded-full border border-primary text-primary font-sans text-sm uppercase tracking-widest hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] transition-all duration-300 text-center"
           >
             {t("hero.general_btn")}
-          </Link>
-          <Link
-            href="/tarot"
-            className="px-8 py-4 rounded-full border border-primary/60 text-muted-foreground font-sans text-sm uppercase tracking-widest hover:border-primary hover:text-primary transition-all text-center"
-          >
-            {t("hero.tarot_btn")}
           </Link>
         </div>
       </div>
