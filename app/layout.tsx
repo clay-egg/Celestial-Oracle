@@ -22,17 +22,27 @@ export const metadata: Metadata = {
   title: 'Celestial Oracle - Fortune Teller',
   description: 'Unveil the mysteries of your destiny. Get personalized fortune readings based on your zodiac sign, birth details, and cosmic alignments.',
   generator: 'v0.app',
+  metadataBase: new URL('https://celestial-oracle-three.vercel.app/'),
   openGraph: {
     title: 'Celestial Oracle - Fortune Teller',
     description: 'Unveil the mysteries of your destiny. Get personalized fortune readings based on your zodiac sign, birth details, and cosmic alignments.',
     siteName: 'Celestial Oracle',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Celestial Oracle - Fortune Teller',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Celestial Oracle - Fortune Teller',
     description: 'Unveil the mysteries of your destiny. Get personalized fortune readings based on your zodiac sign, birth details, and cosmic alignments.',
+    images: ['/opengraph-image.png'],
   },
   icons: {
     icon: '/icon.svg',

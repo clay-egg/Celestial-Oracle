@@ -38,33 +38,38 @@ interface TarotInterpretation {
 }
 
 // ─── Spread geometry ──────────────────────────────────────────────────────────
-// Fan pivot is placed BELOW the container so cards fan upward like a real hand.
-// Each card is centered at (pivotX + R*sin(a), pivotY - R*cos(a)) then
-// translated so its top-left corner lands there.
+// Dynamically calculate the fan radius and pivot so it perfectly fits the container width
 function computeSpreadPositions(
   count: number,
   containerW: number,
-  containerH: number,
 ) {
   const isMobile = containerW < 640;
 
   // Card size
-  const cardW = isMobile ? 42 : 58;
-  const cardH = isMobile ? 70 : 96;
+  const cardW = isMobile ? 44 : 58;
+  const cardH = isMobile ? 74 : 96;
 
-  // Fan pivot (x centered, y below the container bottom)
-  const pivotX = containerW / 2;
-  const extraBelow = isMobile ? 280 : 360; // how far below the container bottom
-  const pivotY = containerH + extraBelow;
-
-  // Radius from pivot to card center
-  const radius = isMobile ? 340 : 480;
-
-  // Total fan spread in degrees (symmetric around 0 = straight up)
-  const totalArc = isMobile ? 120 : 140;
+  // Total fan spread in degrees
+  const totalArc = isMobile ? 130 : 140;
   const halfArc = totalArc / 2;
+  const halfArcRad = (halfArc * Math.PI) / 180;
 
-  return Array.from({ length: count }, (_, i) => {
+  // Ensure the fan width takes up most of the container but leaves a tiny margin
+  const maxFanWidth = containerW * (isMobile ? 0.98 : 0.92);
+  const radius = maxFanWidth / (2 * Math.sin(halfArcRad));
+
+  // The center card is at the top of the arc. Add some padding from the top edge.
+  const topPadding = isMobile ? 20 : 40;
+  
+  // Pivot point is placed below so the center card lands exactly at topPadding
+  const pivotY = radius + cardH / 2 + topPadding;
+  const pivotX = containerW / 2;
+
+  // Calculate required container height based on the lowest cards (the edges of the fan)
+  const cy_edge = pivotY - radius * Math.cos(halfArcRad);
+  const containerH = cy_edge + cardH / 2 + (isMobile ? 10 : 30);
+
+  const positions = Array.from({ length: count }, (_, i) => {
     const t = count === 1 ? 0.5 : i / (count - 1);
     const angleDeg = -halfArc + t * totalArc;
     const angleRad = (angleDeg * Math.PI) / 180;
@@ -73,34 +78,39 @@ function computeSpreadPositions(
     const cx = pivotX + radius * Math.sin(angleRad);
     const cy = pivotY - radius * Math.cos(angleRad);
 
-    // Top-left of the card (Framer Motion x/y are from element origin = top-left of container)
+    // Top-left of the card (Framer Motion origin)
     const x = cx - cardW / 2;
     const y = cy - cardH / 2;
 
     return { x, y, rotate: angleDeg, cardW, cardH, zIndex: i };
   });
+
+  return { positions, containerH };
 }
 
 // ─── CardBack component ────────────────────────────────────────────────────────
-function CardBack({ width = 60, height = 100 }: { width?: number; height?: number }) {
+function CardBack({ width, height }: { width?: number | string; height?: number | string }) {
+  // If numeric values are provided, use them as inline styles, otherwise let it fill container
+  const style = (width && height) ? { width, height } : { width: "100%", height: "100%" };
+
   return (
     <div
-      className="rounded-lg border-2 border-primary/60 overflow-hidden flex items-center justify-center"
+      className="rounded-lg border-2 border-primary/60 overflow-hidden flex items-center justify-center relative"
       style={{
-        width, height,
+        ...style,
         background: "linear-gradient(135deg, #12122a 0%, #1a1a3e 40%, #0e0e24 100%)",
         boxShadow: "inset 0 0 10px rgba(201,168,76,0.15)",
       }}
     >
       <div
-        className="rounded border border-primary/30 flex items-center justify-center"
+        className="rounded border border-primary/30 flex items-center justify-center absolute"
         style={{
-          width: width * 0.8,
-          height: height * 0.85,
+          width: "80%",
+          height: "85%",
           background: "linear-gradient(135deg, #1e1e40, #141428)",
         }}
       >
-        <svg viewBox="0 0 40 40" width={width * 0.5} height={width * 0.5} className="opacity-70">
+        <svg viewBox="0 0 40 40" className="w-1/2 h-1/2 opacity-70">
           <circle cx="20" cy="20" r="18" fill="none" stroke="#c9a84c" strokeWidth="0.8" />
           <circle cx="20" cy="20" r="12" fill="none" stroke="#c9a84c" strokeWidth="0.5" />
           <circle cx="20" cy="20" r="2" fill="#c9a84c" />
@@ -198,15 +208,16 @@ function FlipCard({
 }) {
   return (
     <motion.div
-      className="flex flex-col items-center gap-3"
+      className="flex flex-col items-center gap-3 shrink-0 snap-center"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5 }}
+      whileHover={{ scale: 1.05, y: -10 }}
+      transition={{ delay, duration: 0.5, type: "spring", stiffness: 300, damping: 20 }}
     >
       <p className="font-sans text-xs text-primary uppercase tracking-widest">{label}</p>
-      <div style={{ perspective: 900 }}>
+      <div className="w-[140px] h-[234px] sm:w-[120px] sm:h-[200px]" style={{ perspective: 900 }}>
         <motion.div
-          style={{ transformStyle: "preserve-3d", position: "relative", width: 120, height: 200 }}
+          style={{ transformStyle: "preserve-3d", position: "relative", width: "100%", height: "100%" }}
           animate={{ rotateY: isRevealed ? 0 : 180 }}
           transition={{ duration: 0.85, ease: [0.4, 0, 0.2, 1] }}
         >
@@ -218,15 +229,15 @@ function FlipCard({
             }}
           >
             <div
-              className="rounded-xl overflow-hidden border-2 border-primary/50 shadow-2xl"
-              style={{ width: 120, height: 200, boxShadow: "0 0 30px rgba(212,170,80,0.3)" }}
+              className="w-full h-full rounded-xl overflow-hidden border-2 border-primary/50 shadow-2xl relative"
+              style={{ boxShadow: "0 0 30px rgba(212,170,80,0.3)" }}
             >
               <Image
                 src={card.imageUrl}
                 alt={card.name}
-                width={120}
-                height={200}
-                className="object-cover w-full h-full"
+                fill
+                sizes="(max-width: 640px) 96px, (max-width: 768px) 100px, 120px"
+                className="object-cover"
                 unoptimized
               />
             </div>
@@ -238,8 +249,9 @@ function FlipCard({
               position: "absolute", inset: 0,
               transform: "rotateY(180deg)",
             }}
+            className="w-full h-full"
           >
-            <CardBack width={120} height={200} />
+            <CardBack width="100%" height="100%" />
           </div>
         </motion.div>
       </div>
@@ -268,7 +280,6 @@ export function TarotSession() {
   const [error, setError] = useState<string | null>(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [containerW, setContainerW] = useState(0);
-  const CONTAINER_H = containerW < 640 ? 240 : 320;
   const observerRef = useRef<ResizeObserver | null>(null);
 
   // Callback ref: executes exactly when AnimatePresence finally mounts the div
@@ -285,9 +296,9 @@ export function TarotSession() {
     }
   }, []);
 
-  const positions = useMemo(
-    () => containerW > 0 ? computeSpreadPositions(deck.length, containerW, CONTAINER_H) : [],
-    [deck.length, containerW, CONTAINER_H],
+  const { positions, containerH } = useMemo(
+    () => containerW > 0 ? computeSpreadPositions(deck.length, containerW) : { positions: [], containerH: 300 },
+    [deck.length, containerW],
   );
 
   // Stage: intro → shuffling
@@ -502,7 +513,7 @@ export function TarotSession() {
               <div
                 ref={containerRef}
                 className="relative mx-auto overflow-visible w-full"
-                style={{ height: CONTAINER_H, maxWidth: 960 }}
+                style={{ height: containerH, maxWidth: 960 }}
               >
                 {/* Mystical table glow at the bottom of the fan */}
                 <div
@@ -566,7 +577,8 @@ export function TarotSession() {
                 </p>
               )}
 
-              <div className="flex flex-col sm:flex-row gap-8 sm:gap-12 items-center justify-center">
+              {/* Carousel Container for Mobile, Side-by-Side on Desktop */}
+              <div className="flex flex-row gap-6 sm:gap-10 lg:gap-12 items-start justify-start sm:justify-center w-full px-8 pb-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar">
                 {drawnCards.map((drawn, i) => (
                   <FlipCard
                     key={drawn.card.id}
@@ -606,29 +618,30 @@ export function TarotSession() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="space-y-6"
             >
-              {/* Three revealed cards (static) */}
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 justify-center items-start mb-8">
+              {/* Three revealed cards (Carousel on mobile, static on desktop) */}
+              <div className="flex flex-row gap-6 sm:gap-10 justify-start sm:justify-center items-start mb-8 w-full px-8 pb-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar">
                 {drawnCards.map((drawn, i) => (
                   <motion.div
                     key={drawn.card.id}
-                    className="flex flex-col items-center gap-3"
+                    className="flex flex-col items-center gap-3 shrink-0 snap-center w-[140px] sm:w-[120px]"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.05, y: -10 }}
+                    transition={{ delay: i * 0.1, type: "spring", stiffness: 300, damping: 20 }}
                   >
-                    <p className="font-sans text-xs text-primary uppercase tracking-widest">
+                    <p className="font-sans text-xs text-primary uppercase tracking-widest text-center">
                       {POSITION_LABELS[drawn.position]}
                     </p>
                     <div
-                      className="rounded-xl overflow-hidden border-2 border-primary/40 shadow-2xl"
-                      style={{ width: 100, height: 167, boxShadow: "0 0 20px rgba(212,170,80,0.25)" }}
+                      className="w-full aspect-[100/167] rounded-xl overflow-hidden border-2 border-primary/40 shadow-2xl relative"
+                      style={{ boxShadow: "0 0 20px rgba(212,170,80,0.25)" }}
                     >
                       <Image
                         src={drawn.card.imageUrl}
                         alt={drawn.card.name}
-                        width={100}
-                        height={167}
-                        className="object-cover w-full h-full"
+                        fill
+                        sizes="140px"
+                        className="object-cover"
                         unoptimized
                       />
                     </div>
