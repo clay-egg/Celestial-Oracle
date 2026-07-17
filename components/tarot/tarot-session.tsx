@@ -60,7 +60,7 @@ function computeSpreadPositions(
 
   // The center card is at the top of the arc. Add some padding from the top edge.
   const topPadding = isMobile ? 20 : 40;
-  
+
   // Pivot point is placed below so the center card lands exactly at topPadding
   const pivotY = radius + cardH / 2 + topPadding;
   const pivotX = containerW / 2;
@@ -144,26 +144,26 @@ function CardBack({ width, height }: { width?: number | string; height?: number 
 // ─── Single face-down spread card ─────────────────────────────────────────
 function SpreadCard({
   x, y, rotate, cardW, cardH, zIndex, index,
-  isSelected, isDisabled, onClick,
+  isSelected, isDisabled, isTouchHovered, onClick,
 }: {
   x: number; y: number; rotate: number; cardW: number; cardH: number;
   zIndex: number; index: number;
-  isSelected: boolean; isDisabled: boolean; onClick: () => void;
+  isSelected: boolean; isDisabled: boolean; isTouchHovered: boolean; onClick: () => void;
 }) {
   // Stagger: cards fan out from center outward, capped at 400ms total
   const delay = Math.min(index / 78, 1) * 0.4;
 
   return (
     <motion.button
-      className="absolute cursor-pointer focus:outline-none"
-      style={{ top: 0, left: 0, zIndex: isSelected ? 100 : zIndex, willChange: "transform" }}
+      className="absolute cursor-pointer focus:outline-none select-none"
+      style={{ top: 0, left: 0, zIndex: isSelected ? 100 : (isTouchHovered ? 200 : zIndex), willChange: "transform" }}
       initial={{ x, y: y + 60, rotate: 0, opacity: 0, scale: 0.7 }}
       animate={{
         x,
-        y: isSelected ? y - 28 : y,
+        y: isSelected ? y - 28 : (isTouchHovered ? y - 18 : y),
         rotate: isSelected ? 0 : rotate,
         opacity: isDisabled && !isSelected ? 0.4 : 1,
-        scale: isSelected ? 1.12 : 1,
+        scale: isSelected ? 1.12 : (isTouchHovered ? 1.12 : 1),
       }}
       transition={{
         type: "spring",
@@ -183,11 +183,14 @@ function SpreadCard({
         style={{
           filter: isSelected
             ? "drop-shadow(0 0 16px rgba(212,170,80,1)) drop-shadow(0 0 32px rgba(212,170,80,0.6))"
-            : "drop-shadow(0 3px 8px rgba(0,0,0,0.6))",
+            : (isTouchHovered
+              ? "drop-shadow(0 0 12px rgba(212,170,80,0.8))"
+              : "drop-shadow(0 3px 8px rgba(0,0,0,0.6))"),
+          transition: "filter 0.2s ease",
         }}
       >
         <CardBack width={cardW} height={cardH} />
-        {isSelected && (
+        {(isSelected || isTouchHovered) && (
           <motion.div
             className="absolute inset-0 rounded-lg pointer-events-none"
             style={{ boxShadow: "inset 0 0 0 2px #d4aa50" }}
@@ -282,8 +285,13 @@ export function TarotSession() {
   const [containerW, setContainerW] = useState(0);
   const observerRef = useRef<ResizeObserver | null>(null);
 
+  // Reference to track container element bounds for touch gesture math
+  const containerElementRef = useRef<HTMLDivElement | null>(null);
+  const [activeTouchIndex, setActiveTouchIndex] = useState<number | null>(null);
+
   // Callback ref: executes exactly when AnimatePresence finally mounts the div
   const containerRef = useCallback((node: HTMLDivElement | null) => {
+    containerElementRef.current = node;
     if (observerRef.current) {
       observerRef.current.disconnect();
       observerRef.current = null;
@@ -300,6 +308,7 @@ export function TarotSession() {
     () => containerW > 0 ? computeSpreadPositions(deck.length, containerW) : { positions: [], containerH: 300 },
     [deck.length, containerW],
   );
+
 
   // Stage: intro → shuffling
   const startReading = useCallback(() => {
@@ -377,6 +386,82 @@ export function TarotSession() {
     setError(null);
     setRevealedCount(0);
   };
+
+  // Find the closest non-disabled card to a given screen touch point
+  const getClosestCardIndex = useCallback((clientX: number, clientY: number) => {
+    if (!containerElementRef.current || positions.length === 0) return null;
+
+    const rect = containerElementRef.current.getBoundingClientRect();
+    const touchX = clientX - rect.left;
+    const touchY = clientY - rect.top;
+
+    let closestIdx = -1;
+    let minDistance = Infinity;
+
+    positions.forEach((pos, idx) => {
+      const isSelected = selectedIndices.includes(idx);
+      const isDisabled = selectedIndices.length >= 3 && !isSelected;
+      if (isDisabled) return;
+
+      const centerX = pos.x + pos.cardW / 2;
+      const centerY = pos.y + pos.cardH / 2;
+
+      const dx = touchX - centerX;
+      const dy = touchY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIdx = idx;
+      }
+    });
+
+    // If the touch is more than 150px away from the closest card center, cancel touch hover
+    if (minDistance > 150) {
+      return null;
+    }
+
+    return closestIdx;
+  }, [positions, selectedIndices]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (stage !== "spread") return;
+    const touch = e.touches[0];
+    const idx = getClosestCardIndex(touch.clientX, touch.clientY);
+    if (idx !== null) {
+      setActiveTouchIndex(idx);
+      if (typeof window !== "undefined" && window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(10);
+      }
+    }
+  }, [stage, getClosestCardIndex]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (stage !== "spread") return;
+    const touch = e.touches[0];
+    const idx = getClosestCardIndex(touch.clientX, touch.clientY);
+    if (idx !== activeTouchIndex) {
+      setActiveTouchIndex(idx);
+      if (idx !== null && typeof window !== "undefined" && window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(10);
+      }
+    }
+  }, [stage, activeTouchIndex, getClosestCardIndex]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (stage !== "spread") return;
+    if (activeTouchIndex !== null) {
+      if (e.cancelable) {
+        e.preventDefault(); // Stop click simulation
+      }
+      pickCard(activeTouchIndex);
+    }
+    setActiveTouchIndex(null);
+  }, [stage, activeTouchIndex, pickCard]);
+
+  const handleTouchCancel = useCallback(() => {
+    setActiveTouchIndex(null);
+  }, []);
 
   const POSITION_LABELS = {
     past: t("tarot.past"),
@@ -512,8 +597,12 @@ export function TarotSession() {
               {/* Fan spread container */}
               <div
                 ref={containerRef}
-                className="relative mx-auto overflow-visible w-full"
-                style={{ height: containerH, maxWidth: 960 }}
+                className="relative mx-auto overflow-visible w-full select-none"
+                style={{ height: containerH, maxWidth: 960, touchAction: "none" }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onTouchCancel={handleTouchCancel}
               >
                 {/* Mystical table glow at the bottom of the fan */}
                 <div
@@ -531,6 +620,7 @@ export function TarotSession() {
                   if (!pos) return null;
                   const isSelected = selectedIndices.includes(idx);
                   const isDisabled = selectedIndices.length >= 3 && !isSelected;
+                  const isTouchHovered = activeTouchIndex === idx;
                   return (
                     <SpreadCard
                       key={idx}
@@ -538,6 +628,7 @@ export function TarotSession() {
                       {...pos}
                       isSelected={isSelected}
                       isDisabled={isDisabled}
+                      isTouchHovered={isTouchHovered}
                       onClick={() => pickCard(idx)}
                     />
                   );
