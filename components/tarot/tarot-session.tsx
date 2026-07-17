@@ -490,13 +490,9 @@ export function TarotSession() {
 
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Star className="w-6 h-6 text-primary" />
-            <h2 className="text-3xl md:text-4xl font-sans gold-text tracking-wider">
-              {t("tarot.title")}
-            </h2>
-            <Star className="w-6 h-6 text-primary" />
-          </div>
+          <h2 className="text-3xl md:text-4xl font-sans gold-text tracking-wider mb-4">
+            {t("tarot.title")}
+          </h2>
           <p className="font-serif text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t("tarot.subtitle")}
           </p>
@@ -551,9 +547,8 @@ export function TarotSession() {
               <div className="text-center">
                 <button
                   onClick={startReading}
-                  className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all animate-glow-pulse"
+                  className="inline-flex items-center px-10 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all animate-glow-pulse cursor-pointer"
                 >
-                  <Sparkles className="w-5 h-5" />
                   {t("tarot.begin_btn")}
                 </button>
               </div>
@@ -713,9 +708,8 @@ export function TarotSession() {
                 >
                   <button
                     onClick={confirmSelection}
-                    className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all animate-glow-pulse shadow-xl cursor-pointer"
+                    className="inline-flex items-center px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all animate-glow-pulse shadow-xl cursor-pointer"
                   >
-                    <Sparkles className="w-4 h-4" />
                     {t("tarot.reveal_reading")}
                   </button>
                 </motion.div>
@@ -730,38 +724,44 @@ export function TarotSession() {
               className="flex flex-col items-center"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             >
-              {stage === "arranging" && (
-                <p className="font-serif text-xl text-muted-foreground animate-pulse mb-8">
-                  {t("tarot.arranging")}
-                </p>
-              )}
-              {stage === "revealing" && (
-                <p className="font-serif text-xl text-muted-foreground mb-8">
-                  {t("tarot.revealing")}
-                </p>
-              )}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-20 animate-fade-in-up">
+                  <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-glow-pulse mb-6">
+                    <Sparkles className="w-10 h-10 text-primary animate-spin" />
+                  </div>
+                  <p className="font-serif text-xl text-muted-foreground animate-pulse text-center">
+                    {t("tarot.interpreting")}
+                  </p>
+                  <p className="font-serif text-sm text-muted-foreground mt-2 text-center">
+                    {t("tarot.interpreting_sub")}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {stage === "arranging" && (
+                    <p className="font-serif text-xl text-muted-foreground animate-pulse mb-8">
+                      {t("tarot.arranging")}
+                    </p>
+                  )}
+                  {stage === "revealing" && (
+                    <p className="font-serif text-xl text-muted-foreground mb-8">
+                      {t("tarot.revealing")}
+                    </p>
+                  )}
 
-              {/* Carousel Container for Mobile, Side-by-Side on Desktop */}
-              <div className="flex flex-row gap-6 sm:gap-10 lg:gap-12 items-start justify-start sm:justify-center w-full px-8 pb-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar">
-                {drawnCards.map((drawn, i) => (
-                  <FlipCard
-                    key={drawn.card.id}
-                    card={drawn.card}
-                    isRevealed={revealedCount > i}
-                    label={POSITION_LABELS[drawn.position]}
-                    delay={i * 0.15}
-                  />
-                ))}
-              </div>
-
-              {isLoading && (
-                <motion.div
-                  className="flex items-center gap-3 mt-10 font-serif text-muted-foreground"
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
-                >
-                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                  {t("tarot.interpreting")}
-                </motion.div>
+                  {/* Carousel Container for Mobile, Side-by-Side on Desktop */}
+                  <div className="flex flex-row gap-6 sm:gap-10 lg:gap-12 items-start justify-start sm:justify-center w-full px-8 pb-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar">
+                    {drawnCards.map((drawn, i) => (
+                      <FlipCard
+                        key={drawn.card.id}
+                        card={drawn.card}
+                        isRevealed={revealedCount > i}
+                        label={POSITION_LABELS[drawn.position]}
+                        delay={i * 0.15}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
 
               {error && (
@@ -884,12 +884,11 @@ export function TarotSession() {
                   ))}
                 </div>
 
-                <div className="mt-8 text-center">
+                 <div className="mt-8 text-center">
                   <button
                     onClick={reset}
-                    className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all"
+                    className="inline-flex items-center px-8 py-3 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" />
                     {t("tarot.new_reading")}
                   </button>
                 </div>

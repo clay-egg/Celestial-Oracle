@@ -69,13 +69,9 @@ export function PersonalReadingSection() {
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="w-6 h-6 text-primary" />
-            <h2 className="text-3xl md:text-4xl font-sans gold-text tracking-wider">
-              {t("personal.title")}
-            </h2>
-            <Sparkles className="w-6 h-6 text-primary" />
-          </div>
+          <h2 className="text-3xl md:text-4xl font-sans gold-text tracking-wider mb-4">
+            {t("personal.title")}
+          </h2>
           <p className="font-serif text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t("personal.subtitle")}
           </p>

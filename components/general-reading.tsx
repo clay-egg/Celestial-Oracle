@@ -66,13 +66,9 @@ export function GeneralReadingSection() {
       <div className="max-w-5xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Star className="w-6 h-6 text-primary" />
-            <h2 className="text-3xl md:text-4xl font-sans gold-text tracking-wider">
-              {t("general.title")}
-            </h2>
-            <Star className="w-6 h-6 text-primary" />
-          </div>
+          <h2 className="text-3xl md:text-4xl font-sans gold-text tracking-wider mb-4">
+            {t("general.title")}
+          </h2>
           <p className="font-serif text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t("general.subtitle")}
           </p>
@@ -153,9 +149,8 @@ export function GeneralReadingSection() {
               <div className="mt-8 text-center">
                 <button
                   onClick={reset}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all"
+                  className="inline-flex items-center px-8 py-3 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all cursor-pointer"
                 >
-                  <RotateCcw className="w-4 h-4" />
                   {t("general.new_reading")}
                 </button>
               </div>
@@ -316,10 +311,9 @@ export function GeneralReadingSection() {
                   <button
                     onClick={handleGenerate}
                     disabled={!selectedPeriod}
-                    className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed animate-glow-pulse"
+                    className="inline-flex items-center px-10 py-4 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed animate-glow-pulse cursor-pointer"
                   >
                     {t("general.reveal")}
-                    <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
 
