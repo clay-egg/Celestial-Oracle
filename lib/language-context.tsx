@@ -179,6 +179,8 @@ const translations: Record<Language, Record<string, string>> = {
     "tarot.affirmation": "Your Affirmation",
     "tarot.card_meanings": "Card Meanings",
     "tarot.new_reading": "New Reading",
+    "tarot.your_spread": "Your Spread",
+    "tarot.reveal_reading": "Reveal My Reading",
   },
   th: {
     // Nav
@@ -348,6 +350,8 @@ const translations: Record<Language, Record<string, string>> = {
     "tarot.affirmation": "คำยืนยันพลังใจ",
     "tarot.card_meanings": "ความหมายของไพ่",
     "tarot.new_reading": "จั่วไพ่ใหม่",
+    "tarot.your_spread": "ไพ่ที่คุณเลือก",
+    "tarot.reveal_reading": "เปิดคำทำนาย",
   },
 };
 

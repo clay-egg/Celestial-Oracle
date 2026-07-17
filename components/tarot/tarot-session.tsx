@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ALL_TAROT_CARDS, shuffleDeck, type TarotCard } from "@/lib/tarot-data";
 import { useLanguage } from "@/lib/language-context";
-import { Sparkles, Star, RotateCcw, Loader2 } from "lucide-react";
+import { Sparkles, Star, RotateCcw, Loader2, X } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Stage =
@@ -221,6 +221,7 @@ function FlipCard({
       <div className="w-[140px] h-[234px] sm:w-[120px] sm:h-[200px]" style={{ perspective: 900 }}>
         <motion.div
           style={{ transformStyle: "preserve-3d", position: "relative", width: "100%", height: "100%" }}
+          initial={{ rotateY: 180 }}
           animate={{ rotateY: isRevealed ? 0 : 180 }}
           transition={{ duration: 0.85, ease: [0.4, 0, 0.2, 1] }}
         >
@@ -229,6 +230,7 @@ function FlipCard({
             style={{
               backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden",
               position: "absolute", inset: 0,
+              transform: "rotateY(0deg)",
             }}
           >
             <div
@@ -276,7 +278,8 @@ export function TarotSession() {
   const [stage, setStage] = useState<Stage>("intro");
   const [question, setQuestion] = useState("");
   const [deck, setDeck] = useState<TarotCard[]>([]);
-  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  const [selectedIndices, setSelectedIndices] = useState<(number | null)[]>([null, null, null]);
+  const selectedCount = selectedIndices.filter((idx) => idx !== null).length;
   const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
   const [interpretation, setInterpretation] = useState<TarotInterpretation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -315,45 +318,56 @@ export function TarotSession() {
     setStage("shuffling");
     setTimeout(() => {
       setDeck(shuffleDeck(ALL_TAROT_CARDS));
-      setSelectedIndices([]);
+      setSelectedIndices([null, null, null]);
       setStage("spread");
     }, 1800);
   }, []);
 
   // Stage: spread — pick a card
   const pickCard = useCallback((idx: number) => {
-    if (selectedIndices.includes(idx) || selectedIndices.length >= 3) return;
-    const next = [...selectedIndices, idx];
-    setSelectedIndices(next);
+    setSelectedIndices((prev) => {
+      if (prev.includes(idx)) return prev;
+      const emptyIdx = prev.indexOf(null);
+      if (emptyIdx === -1) return prev; // All slots filled
+      const next = [...prev];
+      next[emptyIdx] = idx;
+      return next;
+    });
+  }, []);
 
-    if (next.length === 3) {
-      // Move to arranging after brief pause
-      setTimeout(() => {
-        const positions: ("past" | "present" | "future")[] = ["past", "present", "future"];
-        const drawn: DrawnCard[] = next.map((cardIdx, i) => ({
-          card: deck[cardIdx],
-          position: positions[i],
-          revealed: false,
-        }));
-        setDrawnCards(drawn);
-        setRevealedCount(0);
-        setStage("arranging");
+  const removeCard = useCallback((itemIndex: number) => {
+    setSelectedIndices((prev) => {
+      const next = [...prev];
+      next[itemIndex] = null;
+      return next;
+    });
+  }, []);
 
-        // Start revealing after arrange animation
+  const confirmSelection = useCallback(() => {
+    if (selectedCount !== 3) return;
+    const positions: ("past" | "present" | "future")[] = ["past", "present", "future"];
+    const drawn: DrawnCard[] = selectedIndices.map((cardIdx, i) => ({
+      card: deck[cardIdx!],
+      position: positions[i],
+      revealed: false,
+    }));
+    setDrawnCards(drawn);
+    setRevealedCount(0);
+    setStage("arranging");
+
+    // Start revealing after arrange animation
+    setTimeout(() => {
+      setStage("revealing");
+      // Reveal cards one by one
+      [0, 1, 2].forEach((i) => {
         setTimeout(() => {
-          setStage("revealing");
-          // Reveal cards one by one
-          [0, 1, 2].forEach((i) => {
-            setTimeout(() => {
-              setRevealedCount(i + 1);
-            }, i * 1200);
-          });
-          // Fetch AI after all revealed
-          setTimeout(() => fetchInterpretation(drawn), 3800);
-        }, 900);
-      }, 400);
-    }
-  }, [selectedIndices, deck]);
+          setRevealedCount(i + 1);
+        }, i * 1200);
+      });
+      // Fetch AI after all revealed
+      setTimeout(() => fetchInterpretation(drawn), 3800);
+    }, 900);
+  }, [selectedIndices, selectedCount, deck]);
 
   const fetchInterpretation = async (drawn: DrawnCard[]) => {
     setIsLoading(true);
@@ -380,7 +394,7 @@ export function TarotSession() {
     setStage("intro");
     setQuestion("");
     setDeck([]);
-    setSelectedIndices([]);
+    setSelectedIndices([null, null, null]);
     setDrawnCards([]);
     setInterpretation(null);
     setError(null);
@@ -400,7 +414,7 @@ export function TarotSession() {
 
     positions.forEach((pos, idx) => {
       const isSelected = selectedIndices.includes(idx);
-      const isDisabled = selectedIndices.length >= 3 && !isSelected;
+      const isDisabled = selectedCount >= 3 && !isSelected;
       if (isDisabled) return;
 
       const centerX = pos.x + pos.cardW / 2;
@@ -422,7 +436,7 @@ export function TarotSession() {
     }
 
     return closestIdx;
-  }, [positions, selectedIndices]);
+  }, [positions, selectedIndices, selectedCount]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (stage !== "spread") return;
@@ -586,7 +600,7 @@ export function TarotSession() {
                 <p className="font-sans text-lg text-foreground tracking-wide">
                   {t("tarot.pick_prompt")}
                   <span className="text-primary ml-2">
-                    {selectedIndices.length}/3
+                    {selectedCount}/3
                   </span>
                 </p>
                 <p className="font-serif text-muted-foreground text-sm mt-1">
@@ -619,7 +633,7 @@ export function TarotSession() {
                   const pos = positions[idx];
                   if (!pos) return null;
                   const isSelected = selectedIndices.includes(idx);
-                  const isDisabled = selectedIndices.length >= 3 && !isSelected;
+                  const isDisabled = selectedCount >= 3 && !isSelected;
                   const isTouchHovered = activeTouchIndex === idx;
                   return (
                     <SpreadCard
@@ -636,17 +650,76 @@ export function TarotSession() {
               </div>
 
 
-              {/* Progress indicator */}
-              <div className="flex justify-center gap-4 mt-8">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    className={`w-3 h-3 rounded-full border-2 ${i < selectedIndices.length ? "bg-primary border-primary" : "bg-transparent border-muted-foreground/40"}`}
-                    animate={i < selectedIndices.length ? { scale: [1, 1.3, 1] } : {}}
-                    transition={{ duration: 0.3 }}
-                  />
-                ))}
+              {/* Selected Cards Display (instead of 3 bullets) */}
+              <div className="max-w-md mx-auto mt-10 px-4">
+                <p className="text-center font-sans text-xs text-muted-foreground uppercase tracking-widest mb-4">
+                  {t("tarot.your_spread")}
+                </p>
+                <div className="grid grid-cols-3 gap-4 justify-center items-center">
+                  {[0, 1, 2].map((i) => {
+                    const isPicked = selectedIndices[i] !== null;
+                    const label = i === 0 ? POSITION_LABELS.past : i === 1 ? POSITION_LABELS.present : POSITION_LABELS.future;
+
+                    return (
+                      <div key={i} className="flex flex-col items-center gap-2">
+                        <div 
+                          className={`relative w-12 sm:w-16 md:w-20 aspect-[100/167] rounded-lg transition-all duration-300 ${
+                            isPicked 
+                              ? "shadow-[0_0_15px_rgba(212,170,80,0.2)]" 
+                              : "border border-dashed border-primary/20 bg-secondary/20 flex flex-col items-center justify-center"
+                          }`}
+                        >
+                          {isPicked ? (
+                            <motion.div 
+                              className="w-full h-full relative"
+                              initial={{ scale: 0.8, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            >
+                              <CardBack />
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeCard(i);
+                                }}
+                                className="absolute -top-2 -right-2 bg-secondary border border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
+                                aria-label="Remove card"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </motion.div>
+                          ) : (
+                            <span className="text-[10px] sm:text-xs text-muted-foreground/40 font-sans font-semibold uppercase tracking-wider">
+                              ?
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] sm:text-xs font-sans text-muted-foreground uppercase tracking-widest text-center">
+                          {label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+
+              {/* Reveal/Confirm Button */}
+              {selectedCount === 3 && (
+                <motion.div 
+                  className="text-center mt-8"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <button
+                    onClick={confirmSelection}
+                    className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-sans text-sm uppercase tracking-widest hover:bg-primary/90 transition-all animate-glow-pulse shadow-xl cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {t("tarot.reveal_reading")}
+                  </button>
+                </motion.div>
+              )}
             </motion.div>
           )}
 
